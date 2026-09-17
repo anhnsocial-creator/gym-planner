@@ -3,107 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiftPulse - Cloud Gym Tracker</title>
+    <title>LiftPulse - Gym Streak Tracker</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <meta name="theme-color" content="#09090b">
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col items-center justify-start p-4">
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col items-center justify-start pb-20 select-none">
 
-    <!-- App Container -->
-    <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl p-5 shadow-xl">
-        
-        <!-- Header & Auth Status -->
-        <header class="flex justify-between items-center mb-6">
-            <div>
-                <h1 class="text-xl font-bold tracking-tight">⚡ LiftPulse</h1>
-                <p id="user-email" class="text-xs text-emerald-400">Not logged in</p>
-            </div>
-            <button id="auth-toggle-btn" class="bg-zinc-800 text-zinc-300 text-xs rounded-lg px-3 py-1.5 border border-zinc-700 hover:bg-zinc-700 transition">
-                Sign In
-            </button>
-        </header>
+    <!-- Top Header Bar -->
+    <header class="w-full max-w-md px-4 py-4 flex justify-between items-center border-b border-zinc-900 bg-zinc-950/80 sticky top-0 z-30 backdrop-blur">
+        <div>
+            <h1 class="text-sm font-semibold text-zinc-400">YOUR TRAINING</h1>
+            <p id="header-greeting" class="text-lg font-bold tracking-tight text-zinc-100">Good morning.</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <span id="user-pill" class="text-[10px] bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-1 rounded-full truncate max-w-[100px]">Not logged in</span>
+            <button id="auth-modal-btn" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-xl transition border border-zinc-700">Sign In</button>
+        </div>
+    </header>
 
-        <!-- Auth Modal Section -->
-        <div id="auth-section" class="hidden mb-6 bg-zinc-950/80 p-4 rounded-xl border border-zinc-800">
-            <h2 id="auth-title" class="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-3">Sign In to Sync</h2>
-            <form id="auth-form" class="space-y-3">
-                <input type="email" id="auth-email" required placeholder="Email address" 
-                    class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-emerald-500">
-                <input type="password" id="auth-password" required placeholder="Password" 
-                    class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-emerald-500">
-                <div class="flex gap-2 items-center">
-                    <button type="submit" id="auth-submit-btn" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-semibold py-1.5 rounded-lg text-xs transition">Login</button>
-                    <button type="button" id="auth-switch-mode" class="text-[10px] text-zinc-400 hover:underline px-1">Need account? Sign up</button>
+    <!-- Main View Container -->
+    <main class="w-full max-w-md p-4 space-y-4">
+
+        <!-- AUTH MODAL OVERLAY -->
+        <div id="auth-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 w-full max-w-sm space-y-4 shadow-2xl">
+                <div class="flex justify-between items-center">
+                    <h3 id="auth-modal-title" class="text-sm font-bold uppercase tracking-wider text-zinc-300">Sign In to Cloud Sync</h3>
+                    <button id="close-auth-modal" class="text-zinc-400 hover:text-white text-sm px-2">✕</button>
                 </div>
-            </form>
+                <form id="auth-form" class="space-y-3">
+                    <input type="email" id="auth-email" required placeholder="Email address" 
+                        class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-orange-500 text-zinc-200">
+                    <input type="password" id="auth-password" required placeholder="Password" 
+                        class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-orange-500 text-zinc-200">
+                    <button type="submit" id="auth-submit-btn" class="w-full bg-orange-500 hover:bg-orange-600 text-zinc-950 font-semibold py-2.5 rounded-xl text-xs transition">Login</button>
+                    <button type="button" id="auth-switch-mode" class="w-full text-center text-[11px] text-zinc-400 hover:underline">Need an account? Sign up</button>
+                </form>
+            </div>
         </div>
 
-        <!-- Main App Content (Locked until logged in) -->
-        <div id="main-app" class="space-y-4 opacity-40 pointer-events-none">
-            
-            <!-- Stats Bar -->
-            <div class="grid grid-cols-2 gap-3">
-                <div class="bg-zinc-950/60 border border-zinc-800 p-3 rounded-xl text-center">
-                    <span class="block text-xs text-zinc-400 uppercase tracking-wider">Active Days</span>
-                    <span id="streak-count" class="text-lg font-bold text-emerald-400">0 Days</span>
+        <!-- TAB 1: HOME VIEW -->
+        <section id="tab-home" class="space-y-4">
+            <!-- Streak Hero Card -->
+            <div class="bg-gradient-to-br from-orange-600 to-amber-600 rounded-2xl p-5 text-zinc-950 shadow-lg relative overflow-hidden">
+                <div class="absolute -right-4 -bottom-4 text-orange-700/30 font-black text-7xl pointer-events-none">⚡</div>
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-xs font-bold uppercase tracking-wider bg-black/20 text-white px-2.5 py-1 rounded-full">Current Streak</span>
+                    <span class="text-2xl">🔥</span>
                 </div>
-                <div class="bg-zinc-950/60 border border-zinc-800 p-3 rounded-xl text-center">
-                    <span class="block text-xs text-zinc-400 uppercase tracking-wider">Total Workouts</span>
-                    <span id="total-count" class="text-lg font-bold text-zinc-200">0</span>
+                <div class="space-y-0.5">
+                    <h2 id="streak-sessions" class="text-4xl font-black tracking-tight text-white">0 sessions</h2>
+                    <p class="text-xs font-medium text-orange-100">Your next session starts a new streak.</p>
                 </div>
             </div>
 
-            <!-- Liftoff-Style Workout Form -->
-            <form id="workout-form" class="space-y-3 bg-zinc-950/40 p-4 rounded-xl border border-zinc-800/80">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Log Workout</h2>
-                    <select id="exercise-library" class="bg-zinc-900 text-zinc-300 text-[10px] rounded px-2 py-1 border border-zinc-800 focus:outline-none">
-                        <option value="">-- Library Presets --</option>
-                        <option value="Dumbbell Curl">Dumbbell Curl</option>
-                        <option value="Bench Press">Bench Press</option>
-                        <option value="Squat">Squat</option>
-                        <option value="Hammer Curl">Hammer Curl</option>
-                        <option value="Push Ups">Push Ups</option>
-                        <option value="Cycling">Cycling</option>
-                    </select>
+            <!-- Quick Stats Grid -->
+            <div class="grid grid-cols-3 gap-2.5">
+                <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-2xl text-center">
+                    <span class="block text-xl mb-1">📅</span>
+                    <span id="stat-total-sessions" class="block text-base font-bold text-white">0</span>
+                    <span class="text-[10px] text-zinc-400 uppercase tracking-wider">Total Sessions</span>
                 </div>
-
-                <div>
-                    <label class="block text-xs text-zinc-400 mb-1">Exercise Name</label>
-                    <input type="text" id="exercise-name" required placeholder="e.g., Incline Dumbbell Press" 
-                        class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-2xl text-center">
+                    <span class="block text-xl mb-1">⏱️</span>
+                    <span class="block text-base font-bold text-white">0m</span>
+                    <span class="text-[10px] text-zinc-400 uppercase tracking-wider">Time Trained</span>
                 </div>
+                <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-2xl text-center">
+                    <span class="block text-xl mb-1">🏔️</span>
+                    <span id="stat-total-volume" class="block text-base font-bold text-white">0</span>
+                    <span class="text-[10px] text-zinc-400 uppercase tracking-wider">Volume (lbs)</span>
+                </div>
+            </div>
 
-                <!-- Dynamic Sets Builder -->
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="text-xs font-medium text-zinc-400 uppercase tracking-wider">Sets</label>
-                        <button type="button" id="add-set-btn" class="text-xs text-emerald-400 hover:underline font-medium">+ Add Set</button>
+            <!-- Quick Action Button -->
+            <button onclick="switchTab('log')" class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-100 font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition text-xs shadow-md">
+                <span>+</span> Log a workout
+            </button>
+
+            <!-- Recent Sessions Feed -->
+            <div class="space-y-2.5 pt-2">
+                <h3 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Recent sessions</h3>
+                <div id="recent-sessions-list" class="space-y-2">
+                    <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-6 text-center space-y-2">
+                        <span class="text-2xl">📋</span>
+                        <h4 class="text-xs font-bold text-zinc-300">No sessions yet</h4>
+                        <p class="text-[11px] text-zinc-500">Log your first session and start building your streak.</p>
                     </div>
-                    <div id="sets-container" class="space-y-2">
-                        <!-- Dynamic sets populated via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: LOG WORKOUT VIEW -->
+        <section id="tab-log" class="hidden space-y-4">
+            <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl space-y-4">
+                <div>
+                    <h2 class="text-sm font-bold text-white">Log workout</h2>
+                    <p class="text-[11px] text-zinc-400">Capture the work while it is still fresh.</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">Session Name</label>
+                        <input type="text" id="session-name" value="Gym session" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">Duration (Minutes)</label>
+                        <input type="number" id="session-duration" value="45" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-orange-500">
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-semibold py-2.5 rounded-lg transition text-xs">
+                <!-- Exercise Selector & Filter -->
+                <div class="space-y-3 pt-2 border-t border-zinc-800">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold uppercase tracking-wider text-zinc-300">Exercises</span>
+                        <span id="selected-count" class="text-[10px] text-orange-400 font-medium">0 selected</span>
+                    </div>
+
+                    <!-- Category Filter Pills -->
+                    <div class="flex gap-1.5 overflow-x-auto pb-1 text-[11px]">
+                        <button onclick="filterExercises('All')" class="filter-pill bg-orange-500 text-zinc-950 font-semibold px-3 py-1 rounded-full whitespace-nowrap transition">All</button>
+                        <button onclick="filterExercises('Free weight')" class="filter-pill bg-zinc-800 text-zinc-300 px-3 py-1 rounded-full whitespace-nowrap transition">Free weight</button>
+                        <button onclick="filterExercises('Machine')" class="filter-pill bg-zinc-800 text-zinc-300 px-3 py-1 rounded-full whitespace-nowrap transition">Machine</button>
+                        <button onclick="filterExercises('Calisthenics')" class="filter-pill bg-zinc-800 text-zinc-300 px-3 py-1 rounded-full whitespace-nowrap transition">Calisthenics</button>
+                    </div>
+
+                    <!-- Expanded Exercise List -->
+                    <div id="exercise-library-list" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+
+                <!-- Active Builder Set Container for Selected Exercises -->
+                <div id="active-sets-builder" class="space-y-3 hidden pt-3 border-t border-zinc-800">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-orange-400">Configure Sets</h3>
+                    <div id="builder-rows" class="space-y-2"></div>
+                </div>
+
+                <button id="save-workout-btn" onclick="saveWorkout()" class="w-full bg-orange-500 hover:bg-orange-600 text-zinc-950 font-semibold py-3 rounded-xl text-xs transition disabled:opacity-40 disabled:pointer-events-none">
                     Save to Cloud
                 </button>
-            </form>
+            </div>
+        </section>
 
-            <!-- Workout History -->
+        <!-- TAB 3: ROUTINES VIEW -->
+        <section id="tab-routines" class="hidden space-y-4">
             <div>
-                <h2 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Cloud History</h2>
-                <div id="workout-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                    <p class="text-zinc-500 text-xs text-center py-4">Please sign in to view workouts.</p>
+                <h2 class="text-base font-bold text-white">Routines</h2>
+                <p class="text-xs text-zinc-400">Your reliable sessions, ready when you are.</p>
+            </div>
+
+            <div class="space-y-3">
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 space-y-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] bg-orange-500/10 text-orange-400 font-semibold px-2 py-0.5 rounded">Starter plan</span>
+                            <h3 class="text-sm font-bold text-white mt-1">Push / Pull / Legs</h3>
+                        </div>
+                        <span class="text-lg">⚡</span>
+                    </div>
+                    <p class="text-xs text-zinc-400">A balanced weekly split for steady progression.</p>
+                    <button onclick="loadRoutine('Push / Pull / Legs')" class="w-full mt-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 py-2 rounded-xl text-xs font-semibold transition">Start routine</button>
+                </div>
+
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 space-y-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] bg-orange-500/10 text-orange-400 font-semibold px-2 py-0.5 rounded">Starter plan</span>
+                            <h3 class="text-sm font-bold text-white mt-1">Full Body Strength</h3>
+                        </div>
+                        <span class="text-lg">🏋️</span>
+                    </div>
+                    <p class="text-xs text-zinc-400">Big compound movements when time is tight.</p>
+                    <button onclick="loadRoutine('Full Body Strength')" class="w-full mt-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 py-2 rounded-xl text-xs font-semibold transition">Start routine</button>
+                </div>
+
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 space-y-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] bg-orange-500/10 text-orange-400 font-semibold px-2 py-0.5 rounded">Starter plan</span>
+                            <h3 class="text-sm font-bold text-white mt-1">Bodymovement Foundation</h3>
+                        </div>
+                        <span class="text-lg">🤸</span>
+                    </div>
+                    <p class="text-xs text-zinc-400">A no-equipment session you can do anywhere.</p>
+                    <button onclick="loadRoutine('Bodymovement Foundation')" class="w-full mt-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 py-2 rounded-xl text-xs font-semibold transition">Start routine</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: HISTORY VIEW -->
+        <section id="tab-history" class="hidden space-y-4">
+            <div>
+                <h2 class="text-base font-bold text-white">History</h2>
+                <p class="text-xs text-zinc-400">Every session is proof you showed up.</p>
+            </div>
+
+            <!-- History Stats Summary -->
+            <div class="grid grid-cols-3 gap-2.5">
+                <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-2xl text-center">
+                    <span id="history-sessions-count" class="block text-lg font-bold text-white">0</span>
+                    <span class="text-[10px] text-zinc-400 uppercase tracking-wider">Sessions</span>
+                </div>
+                <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-2xl text-center">
+                    <span id="history-sets-count" class="block text-lg font-bold text-white">0</span>
+                    <span class="text-[10px] text-zinc-400 uppercase tracking-wider">Sets logged</span>
+                </div>
+                <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-2xl text-center">
+                    <span id="history-muscles-count" class="block text-lg font-bold text-white">0</span>
+                    <span class="text-[10px] text-zinc-400 uppercase tracking-wider">Exercises</span>
                 </div>
             </div>
 
-        </div>
+            <div id="full-history-list" class="space-y-2.5 pt-2">
+                <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-8 text-center space-y-2">
+                    <span class="text-3xl">📅</span>
+                    <h3 class="text-xs font-bold text-zinc-300">Your history starts here</h3>
+                    <p class="text-[11px] text-zinc-500">Once you save a workout, it will show up in this timeline.</p>
+                </div>
+            </div>
+        </section>
 
-    </div>
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-zinc-950/90 border-t border-zinc-900 backdrop-blur-md z-30 max-w-md mx-auto flex justify-around py-3 px-2">
+        <button onclick="switchTab('home')" id="nav-home" class="nav-btn flex flex-col items-center text-orange-500 transition">
+            <span class="text-lg">🏠</span>
+            <span class="text-[10px] font-medium mt-0.5">Home</span>
+        </button>
+        <button onclick="switchTab('log')" id="nav-log" class="nav-btn flex flex-col items-center text-zinc-400 hover:text-zinc-200 transition">
+            <span class="text-lg">⚡</span>
+            <span class="text-[10px] font-medium mt-0.5">Log workout</span>
+        </button>
+        <button onclick="switchTab('routines')" id="nav-routines" class="nav-btn flex flex-col items-center text-zinc-400 hover:text-zinc-200 transition">
+            <span class="text-lg">📋</span>
+            <span class="text-[10px] font-medium mt-0.5">Routines</span>
+        </button>
+        <button onclick="switchTab('history')" id="nav-history" class="nav-btn flex flex-col items-center text-zinc-400 hover:text-zinc-200 transition">
+            <span class="text-lg">📊</span>
+            <span class="text-[10px] font-medium mt-0.5">History</span>
+        </button>
+    </nav>
 
     <!-- App Script -->
     <script>
@@ -116,95 +260,60 @@
         let currentUser = null;
         let isSignUpMode = false;
 
-        const authToggleBtn = document.getElementById('auth-toggle-btn');
-        const authSection = document.getElementById('auth-section');
+        // Expanded Exercise Database
+        const EXERCISE_LIBRARY = [
+            { name: 'Barbell Squat', category: 'Free weight', muscle: 'Legs' },
+            { name: 'Bench Press', category: 'Free weight', muscle: 'Chest' },
+            { name: 'Deadlift', category: 'Free weight', muscle: 'Back' },
+            { name: 'Dumbbell Row', category: 'Free weight', muscle: 'Back' },
+            { name: 'Shoulder Press', category: 'Free weight', muscle: 'Shoulders' },
+            { name: 'Lat Pulldown', category: 'Machine', muscle: 'Back' },
+            { name: 'Leg Press', category: 'Machine', muscle: 'Legs' },
+            { name: 'Cable Crossover', category: 'Machine', muscle: 'Chest' },
+            { name: 'Push Ups', category: 'Calisthenics', muscle: 'Chest' },
+            { name: 'Pull Ups', category: 'Calisthenics', muscle: 'Back' },
+            { name: 'Dips', category: 'Calisthenics', muscle: 'Arms' },
+            { name: 'Cycling', category: 'Cardio', muscle: 'Legs' }
+        ];
+
+        let selectedExercises = [];
+
+        // Navigation Switcher
+        function switchTab(tabId) {
+            ['home', 'log', 'routines', 'history'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).className = 'nav-btn flex flex-col items-center text-zinc-400 hover:text-zinc-200 transition';
+            });
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabId}`).className = 'nav-btn flex flex-col items-center text-orange-500 transition';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Auth Modal Controls
+        const authModal = document.getElementById('auth-modal');
+        const authModalBtn = document.getElementById('auth-modal-btn');
+        const closeAuthModal = document.getElementById('close-auth-modal');
         const authForm = document.getElementById('auth-form');
-        const authTitle = document.getElementById('auth-title');
-        const authSubmitBtn = document.getElementById('auth-submit-btn');
+        const userPill = document.getElementById('user-pill');
+        const headerGreeting = document.getElementById('header-greeting');
         const authSwitchMode = document.getElementById('auth-switch-mode');
-        const userEmailDisplay = document.getElementById('user-email');
-        const mainApp = document.getElementById('main-app');
-        
-        const workoutForm = document.getElementById('workout-form');
-        const workoutList = document.getElementById('workout-list');
-        const streakCount = document.getElementById('streak-count');
-        const totalCount = document.getElementById('total-count');
-        const setsContainer = document.getElementById('sets-container');
-        const addSetBtn = document.getElementById('add-set-btn');
-        const exerciseLibrary = document.getElementById('exercise-library');
-        const exerciseNameInput = document.getElementById('exercise-name');
+        const authModalTitle = document.getElementById('auth-modal-title');
+        const authSubmitBtn = document.getElementById('auth-submit-btn');
 
-        exerciseLibrary.addEventListener('change', (e) => {
-            if (e.target.value) exerciseNameInput.value = e.target.value;
-        });
-
-        function addSetRow(weight = '', reps = '') {
-            const setIndex = setsContainer.children.length + 1;
-            const row = document.createElement('div');
-            row.className = 'flex items-center gap-2 bg-zinc-900/80 p-2 rounded-lg border border-zinc-800 set-row';
-            row.innerHTML = `
-                <span class="text-[10px] font-bold text-zinc-500 w-10">Set ${setIndex}</span>
-                <div class="flex-1">
-                    <input type="number" placeholder="Lbs" value="${weight}" class="set-weight w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-center focus:outline-none focus:border-emerald-500" required>
-                </div>
-                <span class="text-zinc-600">×</span>
-                <div class="flex-1">
-                    <input type="number" placeholder="Reps" value="${reps}" class="set-reps w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-center focus:outline-none focus:border-emerald-500" required>
-                </div>
-                <button type="button" class="remove-set text-zinc-500 hover:text-red-400 px-1.5 text-xs">✕</button>
-            `;
-            row.querySelector('.remove-set').addEventListener('click', () => {
-                row.remove();
-                reindexSets();
-            });
-            setsContainer.appendChild(row);
-        }
-
-        function reindexSets() {
-            Array.from(setsContainer.children).forEach((row, idx) => {
-                row.querySelector('.text-zinc-500').innerText = `Set ${idx + 1}`;
-            });
-        }
-
-        addSetBtn.addEventListener('click', () => addSetRow());
-        addSetRow();
-
-        async function checkUser() {
-            const { data: { session } } = await _supabase.auth.getSession();
-            handleSession(session);
-            _supabase.auth.onAuthStateChange((_event, session) => handleSession(session));
-        }
-
-        function handleSession(session) {
-            currentUser = session?.user || null;
-            if (currentUser) {
-                userEmailDisplay.innerText = currentUser.email;
-                authToggleBtn.innerText = 'Sign Out';
-                authSection.classList.add('hidden');
-                mainApp.classList.remove('opacity-40', 'pointer-events-none');
-                fetchWorkouts();
-            } else {
-                userEmailDisplay.innerText = 'Not logged in';
-                authToggleBtn.innerText = 'Sign In';
-                authSection.classList.remove('hidden');
-                mainApp.classList.add('opacity-40', 'pointer-events-none');
-                workoutList.innerHTML = '<p class="text-zinc-500 text-xs text-center py-4">Please sign in to view workouts.</p>';
-            }
-        }
-
-        authToggleBtn.addEventListener('click', () => {
+        authModalBtn.addEventListener('click', () => {
             if (currentUser) {
                 _supabase.auth.signOut();
             } else {
-                authSection.classList.toggle('hidden');
+                authModal.classList.remove('hidden');
             }
         });
+        closeAuthModal.addEventListener('click', () => authModal.classList.add('hidden'));
 
         authSwitchMode.addEventListener('click', () => {
             isSignUpMode = !isSignUpMode;
-            authTitle.innerText = isSignUpMode ? 'Create Account' : 'Sign In to Sync';
+            authModalTitle.innerText = isSignUpMode ? 'Create Account' : 'Sign In to Cloud Sync';
             authSubmitBtn.innerText = isSignUpMode ? 'Sign Up' : 'Login';
-            authSwitchMode.innerText = isSignUpMode ? 'Already have an account? Sign in' : 'Need account? Sign up';
+            authSwitchMode.innerText = isSignUpMode ? 'Already have an account? Sign in' : 'Need an account? Sign up';
         });
 
         authForm.addEventListener('submit', async (e) => {
@@ -215,83 +324,288 @@
             if (isSignUpMode) {
                 const { error } = await _supabase.auth.signUp({ email, password });
                 if (error) alert(error.message);
-                else alert('Check your email for confirmation (or sign in if disabled)');
+                else { alert('Check your email for confirmation or sign in!'); authModal.classList.add('hidden'); }
             } else {
                 const { error } = await _supabase.auth.signInWithPassword({ email, password });
                 if (error) alert(error.message);
+                else authModal.classList.add('hidden');
             }
         });
 
+        // Auth State Handler
+        async function initAuth() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            handleSession(session);
+            _supabase.auth.onAuthStateChange((_event, session) => handleSession(session));
+        }
+
+        function handleSession(session) {
+            currentUser = session?.user || null;
+            if (currentUser) {
+                userPill.innerText = currentUser.email;
+                authModalBtn.innerText = 'Sign Out';
+                headerGreeting.innerText = `Welcome back, ${currentUser.email.split('@')[0]}!`;
+                fetchWorkouts();
+            } else {
+                userPill.innerText = 'Not logged in';
+                authModalBtn.innerText = 'Sign In';
+                headerGreeting.innerText = 'Good morning.';
+                renderWorkouts([]);
+            }
+        }
+
+        // Render Exercise Library with Filters
+        function renderExerciseLibrary(filter = 'All') {
+            const container = document.getElementById('exercise-library-list');
+            container.innerHTML = '';
+
+            const filtered = filter === 'All' ? EXERCISE_LIBRARY : EXERCISE_LIBRARY.filter(e => e.category === filter);
+
+            filtered.forEach(ex => {
+                const isSelected = selectedExercises.some(s => s.name === ex.name);
+                const div = document.createElement('div');
+                div.className = `p-3 rounded-xl border flex justify-between items-center cursor-pointer transition ${isSelected ? 'bg-orange-500/10 border-orange-500 text-white' : 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:border-zinc-700'}`;
+                div.innerHTML = `
+                    <div>
+                        <h4 class="text-xs font-semibold">${ex.name}</h4>
+                        <span class="text-[10px] text-zinc-500">${ex.muscle} • ${ex.category}</span>
+                    </div>
+                    <span class="text-xs font-bold px-2 py-1 rounded-lg ${isSelected ? 'bg-orange-500 text-zinc-950' : 'bg-zinc-900 text-zinc-400'}">${isSelected ? 'Added ✓' : '+ Add'}</span>
+                `;
+                div.addEventListener('click', () => toggleExerciseSelection(ex));
+                container.appendChild(div);
+            });
+        }
+
+        function filterExercises(category) {
+            document.querySelectorAll('.filter-pill').forEach(btn => {
+                if (btn.innerText === category) {
+                    btn.className = 'filter-pill bg-orange-500 text-zinc-950 font-semibold px-3 py-1 rounded-full whitespace-nowrap transition';
+                } else {
+                    btn.className = 'filter-pill bg-zinc-800 text-zinc-300 px-3 py-1 rounded-full whitespace-nowrap transition';
+                }
+            });
+            renderExerciseLibrary(category);
+        }
+
+        function toggleExerciseSelection(ex) {
+            const idx = selectedExercises.findIndex(s => s.name === ex.name);
+            if (idx > -1) {
+                selectedExercises.splice(idx, 1);
+            } else {
+                selectedExercises.push({ name: ex.name, sets: [{ weight: '', reps: '' }] });
+            }
+            document.getElementById('selected-count').innerText = `${selectedExercises.length} selected`;
+            renderExerciseLibrary();
+            renderBuilderRows();
+        }
+
+        function renderBuilderRows() {
+            const builderContainer = document.getElementById('active-sets-builder');
+            const rowsContainer = document.getElementById('builder-rows');
+            rowsContainer.innerHTML = '';
+
+            if (selectedExercises.length === 0) {
+                builderContainer.classList.add('hidden');
+                document.getElementById('save-workout-btn').disabled = true;
+                return;
+            }
+
+            builderContainer.classList.remove('hidden');
+            document.getElementById('save-workout-btn').disabled = false;
+
+            selectedExercises.forEach((ex, exIdx) => {
+                const block = document.createElement('div');
+                block.className = 'bg-zinc-950 border border-zinc-800 p-3 rounded-xl space-y-2';
+                block.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-orange-400">${ex.name}</span>
+                        <button type="button" onclick="removeExercise(${exIdx})" class="text-[10px] text-zinc-500 hover:text-red-400">Remove</button>
+                    </div>
+                    <div class="sets-list space-y-1.5"></div>
+                    <button type="button" onclick="addSet(${exIdx})" class="text-[10px] text-orange-400 font-semibold hover:underline">+ Add set</button>
+                `;
+
+                const setsList = block.querySelector('.sets-list');
+                ex.sets.forEach((set, setIdx) => {
+                    const setRow = document.createElement('div');
+                    setRow.className = 'flex items-center gap-2';
+                    setRow.innerHTML = `
+                        <span class="text-[10px] text-zinc-500 w-8">Set ${setIdx + 1}</span>
+                        <input type="number" placeholder="Lbs" value="${set.weight}" onchange="updateSetVal(${exIdx}, ${setIdx}, 'weight', this.value)" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-xs text-center text-white focus:outline-none focus:border-orange-500">
+                        <span class="text-zinc-600">×</span>
+                        <input type="number" placeholder="Reps" value="${set.reps}" onchange="updateSetVal(${exIdx}, ${setIdx}, 'reps', this.value)" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-xs text-center text-white focus:outline-none focus:border-orange-500">
+                    `;
+                    setsList.appendChild(setRow);
+                });
+                rowsContainer.appendChild(block);
+            });
+        }
+
+        function addSet(exIdx) {
+            selectedExercises[exIdx].sets.push({ weight: '', reps: '' });
+            renderBuilderRows();
+        }
+
+        function removeExercise(exIdx) {
+            selectedExercises.splice(exIdx, 1);
+            document.getElementById('selected-count').innerText = `${selectedExercises.length} selected`;
+            renderExerciseLibrary();
+            renderBuilderRows();
+        }
+
+        function updateSetVal(exIdx, setIdx, field, val) {
+            selectedExercises[exIdx].sets[setIdx][field] = parseFloat(val) || 0;
+        }
+
+        // Fetch Workouts from Supabase
         async function fetchWorkouts() {
+            if (!currentUser) return;
             const { data, error } = await _supabase
                 .from('workouts')
                 .select('*')
                 .order('id', { ascending: false });
 
             if (error) {
-                console.error('Error fetching:', error);
+                console.error('Error fetching workouts:', error);
                 return;
             }
             renderWorkouts(data);
         }
 
+        // Render Workouts across Home and History
         function renderWorkouts(workouts) {
-            workoutList.innerHTML = '';
+            const recentList = document.getElementById('recent-sessions-list');
+            const fullList = document.getElementById('full-history-list');
+
+            recentList.innerHTML = '';
+            fullList.innerHTML = '';
+
             if (!workouts || workouts.length === 0) {
-                workoutList.innerHTML = '<p class="text-zinc-500 text-xs text-center py-4">No workouts logged yet.</p>';
-                streakCount.innerText = '0 Days';
-                totalCount.innerText = '0';
+                recentList.innerHTML = `
+                    <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-6 text-center space-y-2">
+                        <span class="text-2xl">📋</span>
+                        <h4 class="text-xs font-bold text-zinc-300">No sessions yet</h4>
+                        <p class="text-[11px] text-zinc-500">Log your first session and start building your streak.</p>
+                    </div>`;
+                fullList.innerHTML = `
+                    <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-8 text-center space-y-2">
+                        <span class="text-3xl">📅</span>
+                        <h3 class="text-xs font-bold text-zinc-300">Your history starts here</h3>
+                        <p class="text-[11px] text-zinc-500">Once you save a workout, it will show up in this timeline.</p>
+                    </div>`;
+                document.getElementById('streak-sessions').innerText = '0 sessions';
+                document.getElementById('stat-total-sessions').innerText = '0';
+                document.getElementById('stat-total-volume').innerText = '0';
+                document.getElementById('history-sessions-count').innerText = '0';
+                document.getElementById('history-sets-count').innerText = '0';
+                document.getElementById('history-muscles-count').innerText = '0';
                 return;
             }
 
-            workouts.forEach((item) => {
-                const setsFormatted = item.sets_data.map((s, i) => `S${i+1}: ${s.weight}lbs × ${s.reps}`).join(' | ');
-                const div = document.createElement('div');
-                div.className = 'bg-zinc-950/50 border border-zinc-800/80 p-2.5 rounded-xl flex justify-between items-center text-xs';
-                div.innerHTML = `
-                    <div>
-                        <span class="font-semibold text-zinc-200">${item.exercise}</span>
-                        <div class="text-[10px] text-zinc-400 mt-0.5">${setsFormatted}</div>
-                    </div>
-                    <span class="text-[10px] text-zinc-500">${item.date}</span>
-                `;
-                workoutList.appendChild(div);
+            // Calculate metrics
+            let totalVolume = 0;
+            let totalSets = 0;
+
+            workouts.forEach(item => {
+                const sets = item.sets_data || [];
+                sets.forEach(s => totalVolume += (s.weight * s.reps));
+                totalSets += sets.length;
             });
 
-            const uniqueDays = [...new Set(workouts.map(w => w.date))];
-            streakCount.innerText = `${uniqueDays.length} Days`;
-            totalCount.innerText = workouts.length;
+            document.getElementById('streak-sessions').innerText = `${workouts.length} sessions`;
+            document.getElementById('stat-total-sessions').innerText = workouts.length;
+            document.getElementById('stat-total-volume').innerText = totalVolume.toLocaleString();
+            document.getElementById('history-sessions-count').innerText = workouts.length;
+            document.getElementById('history-sets-count').innerText = totalSets;
+            document.getElementById('history-muscles-count').innerText = workouts.length;
+
+            // Render Recent (top 3)
+            workouts.slice(0, 3).forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'bg-zinc-900 border border-zinc-800 p-3.5 rounded-2xl flex justify-between items-center';
+                div.innerHTML = `
+                    <div>
+                        <h4 class="text-xs font-bold text-white">${item.exercise}</h4>
+                        <p class="text-[10px] text-zinc-400 mt-0.5">${item.sets_data.map(s => `${s.weight}lbs × ${s.reps}`).join(' | ')}</p>
+                    </div>
+                    <span class="text-[10px] bg-zinc-800 text-zinc-300 px-2 py-1 rounded-lg">${item.date}</span>
+                `;
+                recentList.appendChild(div);
+            });
+
+            // Render Full History
+            workouts.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'bg-zinc-900 border border-zinc-800 p-4 rounded-2xl space-y-2';
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-xs font-bold text-white">${item.exercise}</h4>
+                        <span class="text-[10px] text-zinc-400">${item.date}</span>
+                    </div>
+                    <div class="text-[11px] text-zinc-300 bg-zinc-950 p-2 rounded-xl">
+                        ${item.sets_data.map((s, i) => `Set ${i+1}: ${s.weight} lbs × ${s.reps} reps`).join('<br>')}
+                    </div>
+                `;
+                fullList.appendChild(div);
+            });
         }
 
-        workoutForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentUser) return;
-
-            const setRows = setsContainer.querySelectorAll('.set-row');
-            const setsDataArray = Array.from(setRows).map(row => ({
-                weight: parseFloat(row.querySelector('.set-weight').value) || 0,
-                reps: parseInt(row.querySelector('.set-reps').value) || 0
-            }));
-
-            const newWorkout = {
-                user_id: currentUser.id,
-                exercise: exerciseNameInput.value,
-                sets_data: setsDataArray,
-                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-            };
-
-            const { error } = await _supabase.from('workouts').insert([newWorkout]);
-            if (error) {
-                alert('Error saving: ' + error.message);
-            } else {
-                workoutForm.reset();
-                setsContainer.innerHTML = '';
-                addSetRow();
-                fetchWorkouts();
+        // Save Workout to Supabase
+        async function saveWorkout() {
+            if (!currentUser) {
+                authModal.classList.remove('hidden');
+                return;
             }
-        });
+            if (selectedExercises.length === 0) return;
 
-        checkUser();
+            const sessionName = document.getElementById('session-name').value;
+
+            for (const ex of selectedExercises) {
+                const newWorkout = {
+                    user_id: currentUser.id,
+                    exercise: `${sessionName}: ${ex.name}`,
+                    sets_data: ex.sets,
+                    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                };
+
+                const { error } = await _supabase.from('workouts').insert([newWorkout]);
+                if (error) {
+                    alert('Error saving: ' + error.message);
+                    return;
+                }
+            }
+
+            // Reset form
+            selectedExercises = [];
+            renderExerciseLibrary();
+            renderBuilderRows();
+            switchTab('home');
+            fetchWorkouts();
+        }
+
+        // Load Routine Starter
+        function loadRoutine(routineName) {
+            selectedExercises = [];
+            if (routineName === 'Push / Pull / Legs') {
+                selectedExercises.push({ name: 'Bench Press', sets: [{weight: 135, reps: 10}, {weight: 135, reps: 8}] });
+                selectedExercises.push({ name: 'Lat Pulldown', sets: [{weight: 120, reps: 10}] });
+            } else if (routineName === 'Full Body Strength') {
+                selectedExercises.push({ name: 'Barbell Squat', sets: [{weight: 185, reps: 5}] });
+                selectedExercises.push({ name: 'Shoulder Press', sets: [{weight: 95, reps: 8}] });
+            } else {
+                selectedExercises.push({ name: 'Push Ups', sets: [{weight: 0, reps: 20}] });
+                selectedExercises.push({ name: 'Pull Ups', sets: [{weight: 0, reps: 10}] });
+            }
+            document.getElementById('selected-count').innerText = `${selectedExercises.length} selected`;
+            renderExerciseLibrary();
+            renderBuilderRows();
+            switchTab('log');
+        }
+
+        // Initialize App
+        renderExerciseLibrary();
+        initAuth();
     </script>
 </body>
 </html>
