@@ -51,6 +51,20 @@
 
         <!-- TAB 1: HOME VIEW -->
         <section id="tab-home" class="space-y-4">
+            
+            <!-- Password Update Section (Forced to the top during recovery) -->
+            <div id="password-update-card" class="bg-zinc-900 border-2 border-orange-500 p-4 rounded-2xl space-y-3 hidden shadow-2xl">
+                <div class="flex justify-between items-center">
+                    <h3 id="security-title" class="text-xs font-bold text-orange-400 uppercase tracking-wider">Reset Your Password</h3>
+                </div>
+                <p id="recovery-notice" class="text-[11px] text-zinc-300">Please enter your new password below to finish resetting it.</p>
+                <input type="password" id="new-password-input" placeholder="New password (min 6 chars)" 
+                    class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-orange-500">
+                <button type="button" onclick="updatePassword()" class="w-full bg-orange-500 hover:bg-orange-600 text-zinc-950 py-2.5 rounded-xl text-xs font-bold transition">
+                    Update Password & Continue
+                </button>
+            </div>
+
             <!-- Streak Hero Card -->
             <div class="bg-gradient-to-br from-orange-600 to-amber-600 rounded-2xl p-5 text-zinc-950 shadow-lg relative overflow-hidden">
                 <div class="absolute -right-4 -bottom-4 text-orange-700/30 font-black text-7xl pointer-events-none">⚡</div>
@@ -87,19 +101,6 @@
             <button onclick="switchTab('log')" class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-100 font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition text-xs shadow-md">
                 <span>+</span> Log a workout
             </button>
-
-            <!-- Password Update Section (Highlighted/Appears on recovery) -->
-            <div id="password-update-card" class="bg-zinc-900 border border-orange-500/50 p-4 rounded-2xl space-y-3 hidden shadow-lg">
-                <div class="flex justify-between items-center">
-                    <h3 id="security-title" class="text-xs font-bold text-orange-400 uppercase tracking-wider">Security Settings</h3>
-                </div>
-                <p id="recovery-notice" class="text-[11px] text-zinc-400 hidden">Please enter your new password below to finish resetting it.</p>
-                <input type="password" id="new-password-input" placeholder="New password (min 6 chars)" 
-                    class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-orange-500">
-                <button type="button" onclick="updatePassword()" class="w-full bg-orange-500 hover:bg-orange-600 text-zinc-950 py-2 rounded-xl text-xs font-semibold transition">
-                    Update Password
-                </button>
-            </div>
 
             <!-- Recent Sessions Feed -->
             <div class="space-y-2.5 pt-2">
@@ -319,8 +320,6 @@
         const authModalTitle = document.getElementById('auth-modal-title');
         const authSubmitBtn = document.getElementById('auth-submit-btn');
         const passwordUpdateCard = document.getElementById('password-update-card');
-        const securityTitle = document.getElementById('security-title');
-        const recoveryNotice = document.getElementById('recovery-notice');
 
         authModalBtn.addEventListener('click', () => {
             if (currentUser) {
@@ -386,20 +385,19 @@
                 alert('Password successfully updated!');
                 document.getElementById('new-password-input').value = '';
                 isPasswordRecovery = false;
-                recoveryNotice.classList.add('hidden');
-                securityTitle.innerText = 'Security Settings';
                 passwordUpdateCard.classList.add('hidden');
-                // Clean URL hash immediately
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         }
 
-        // Auth State Handler
+        // Auth State Handler & Immediate Recovery Check
         async function initAuth() {
-            // Check if user came from a recovery link (URL contains type=recovery or access_token)
+            // Check immediately if URL has recovery indicators
             if (window.location.hash.includes('type=recovery') || window.location.hash.includes('access_token')) {
                 isPasswordRecovery = true;
-                // Immediately clean the URL hash so it doesn't loop on refresh/sign out
+                // Force show the recovery box right away
+                passwordUpdateCard.classList.remove('hidden');
+                passwordUpdateCard.scrollIntoView({ behavior: 'smooth' });
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
@@ -409,6 +407,8 @@
             _supabase.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'PASSWORD_RECOVERY') {
                     isPasswordRecovery = true;
+                    passwordUpdateCard.classList.remove('hidden');
+                    passwordUpdateCard.scrollIntoView({ behavior: 'smooth' });
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
                 handleSession(session);
@@ -422,12 +422,9 @@
                 authModalBtn.innerText = 'Sign Out';
                 headerGreeting.innerText = `Welcome back, ${currentUser.email.split('@')[0]}!`;
                 
-                // Show security card automatically if recovery mode is active
+                // If recovery is active, ensure the card stays pinned at the top
                 if (isPasswordRecovery) {
                     passwordUpdateCard.classList.remove('hidden');
-                    securityTitle.innerText = 'Reset Your Password';
-                    recoveryNotice.classList.remove('hidden');
-                    passwordUpdateCard.scrollIntoView({ behavior: 'smooth' });
                 }
 
                 fetchWorkouts();
@@ -435,7 +432,9 @@
                 userPill.innerText = 'Not logged in';
                 authModalBtn.innerText = 'Sign In';
                 headerGreeting.innerText = 'Good morning.';
-                passwordUpdateCard.classList.add('hidden');
+                if (!isPasswordRecovery) {
+                    passwordUpdateCard.classList.add('hidden');
+                }
                 renderWorkouts([]);
             }
         }
