@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiftPulse - Cloud Gym Tracker</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta name="theme-color" content="#09090b">
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col items-center justify-start p-4">
+
+    <!-- App Container -->
+    <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl p-5 shadow-xl">
+        
+        <!-- Header & Auth Status -->
+        <header class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-xl font-bold tracking-tight">⚡ LiftPulse</h1>
+                <p id="user-email" class="text-xs text-emerald-400">Not logged in</p>
+            </div>
+            <button id="auth-toggle-btn" class="bg-zinc-800 text-zinc-300 text-xs rounded-lg px-3 py-1.5 border border-zinc-700 hover:bg-zinc-700 transition">
+                Sign In
+            </button>
+        </header>
+
+        <!-- Auth Modal Section -->
+        <div id="auth-section" class="hidden mb-6 bg-zinc-950/80 p-4 rounded-xl border border-zinc-800">
+            <h2 id="auth-title" class="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-3">Sign In to Sync</h2>
+            <form id="auth-form" class="space-y-3">
+                <input type="email" id="auth-email" required placeholder="Email address" 
+                    class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-emerald-500">
+                <input type="password" id="auth-password" required placeholder="Password" 
+                    class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-emerald-500">
+                <div class="flex gap-2 items-center">
+                    <button type="submit" id="auth-submit-btn" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-semibold py-1.5 rounded-lg text-xs transition">Login</button>
+                    <button type="button" id="auth-switch-mode" class="text-[10px] text-zinc-400 hover:underline px-1">Need account? Sign up</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Main App Content (Locked until logged in) -->
+        <div id="main-app" class="space-y-4 opacity-40 pointer-events-none">
+            
+            <!-- Stats Bar -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-zinc-950/60 border border-zinc-800 p-3 rounded-xl text-center">
+                    <span class="block text-xs text-zinc-400 uppercase tracking-wider">Active Days</span>
+                    <span id="streak-count" class="text-lg font-bold text-emerald-400">0 Days</span>
+                </div>
+                <div class="bg-zinc-950/60 border border-zinc-800 p-3 rounded-xl text-center">
+                    <span class="block text-xs text-zinc-400 uppercase tracking-wider">Total Workouts</span>
+                    <span id="total-count" class="text-lg font-bold text-zinc-200">0</span>
+                </div>
+            </div>
+
+            <!-- Liftoff-Style Workout Form -->
+            <form id="workout-form" class="space-y-3 bg-zinc-950/40 p-4 rounded-xl border border-zinc-800/80">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Log Workout</h2>
+                    <select id="exercise-library" class="bg-zinc-900 text-zinc-300 text-[10px] rounded px-2 py-1 border border-zinc-800 focus:outline-none">
+                        <option value="">-- Library Presets --</option>
+                        <option value="Dumbbell Curl">Dumbbell Curl</option>
+                        <option value="Bench Press">Bench Press</option>
+                        <option value="Squat">Squat</option>
+                        <option value="Hammer Curl">Hammer Curl</option>
+                        <option value="Push Ups">Push Ups</option>
+                        <option value="Cycling">Cycling</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-zinc-400 mb-1">Exercise Name</label>
+                    <input type="text" id="exercise-name" required placeholder="e.g., Incline Dumbbell Press" 
+                        class="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-2 text-xs focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <!-- Dynamic Sets Builder -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-xs font-medium text-zinc-400 uppercase tracking-wider">Sets</label>
+                        <button type="button" id="add-set-btn" class="text-xs text-emerald-400 hover:underline font-medium">+ Add Set</button>
+                    </div>
+                    <div id="sets-container" class="space-y-2">
+                        <!-- Dynamic sets populated via JS -->
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-semibold py-2.5 rounded-lg transition text-xs">
+                    Save to Cloud
+                </button>
+            </form>
+
+            <!-- Workout History -->
+            <div>
+                <h2 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Cloud History</h2>
+                <div id="workout-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <p class="text-zinc-500 text-xs text-center py-4">Please sign in to view workouts.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- App Script -->
+    <script>
+        const SUPABASE_URL = 'https://vkvczgbswttxmqqqocfwm.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_-p-aRyJBkJ2mCqfnLiv4EA_sgCzW7ic';
+
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+        let isSignUpMode = false;
+
+        const authToggleBtn = document.getElementById('auth-toggle-btn');
+        const authSection = document.getElementById('auth-section');
+        const authForm = document.getElementById('auth-form');
+        const authTitle = document.getElementById('auth-title');
+        const authSubmitBtn = document.getElementById('auth-submit-btn');
+        const authSwitchMode = document.getElementById('auth-switch-mode');
+        const userEmailDisplay = document.getElementById('user-email');
+        const mainApp = document.getElementById('main-app');
+        
+        const workoutForm = document.getElementById('workout-form');
+        const workoutList = document.getElementById('workout-list');
+        const streakCount = document.getElementById('streak-count');
+        const totalCount = document.getElementById('total-count');
+        const setsContainer = document.getElementById('sets-container');
+        const addSetBtn = document.getElementById('add-set-btn');
+        const exerciseLibrary = document.getElementById('exercise-library');
+        const exerciseNameInput = document.getElementById('exercise-name');
+
+        exerciseLibrary.addEventListener('change', (e) => {
+            if (e.target.value) exerciseNameInput.value = e.target.value;
+        });
+
+        function addSetRow(weight = '', reps = '') {
+            const setIndex = setsContainer.children.length + 1;
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-2 bg-zinc-900/80 p-2 rounded-lg border border-zinc-800 set-row';
+            row.innerHTML = `
+                <span class="text-[10px] font-bold text-zinc-500 w-10">Set ${setIndex}</span>
+                <div class="flex-1">
+                    <input type="number" placeholder="Lbs" value="${weight}" class="set-weight w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-center focus:outline-none focus:border-emerald-500" required>
+                </div>
+                <span class="text-zinc-600">×</span>
+                <div class="flex-1">
+                    <input type="number" placeholder="Reps" value="${reps}" class="set-reps w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-center focus:outline-none focus:border-emerald-500" required>
+                </div>
+                <button type="button" class="remove-set text-zinc-500 hover:text-red-400 px-1.5 text-xs">✕</button>
+            `;
+            row.querySelector('.remove-set').addEventListener('click', () => {
+                row.remove();
+                reindexSets();
+            });
+            setsContainer.appendChild(row);
+        }
+
+        function reindexSets() {
+            Array.from(setsContainer.children).forEach((row, idx) => {
+                row.querySelector('.text-zinc-500').innerText = `Set ${idx + 1}`;
+            });
+        }
+
+        addSetBtn.addEventListener('click', () => addSetRow());
+        addSetRow();
+
+        async function checkUser() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            handleSession(session);
+            _supabase.auth.onAuthStateChange((_event, session) => handleSession(session));
+        }
+
+        function handleSession(session) {
+            currentUser = session?.user || null;
+            if (currentUser) {
+                userEmailDisplay.innerText = currentUser.email;
+                authToggleBtn.innerText = 'Sign Out';
+                authSection.classList.add('hidden');
+                mainApp.classList.remove('opacity-40', 'pointer-events-none');
+                fetchWorkouts();
+            } else {
+                userEmailDisplay.innerText = 'Not logged in';
+                authToggleBtn.innerText = 'Sign In';
+                authSection.classList.remove('hidden');
+                mainApp.classList.add('opacity-40', 'pointer-events-none');
+                workoutList.innerHTML = '<p class="text-zinc-500 text-xs text-center py-4">Please sign in to view workouts.</p>';
+            }
+        }
+
+        authToggleBtn.addEventListener('click', () => {
+            if (currentUser) {
+                _supabase.auth.signOut();
+            } else {
+                authSection.classList.toggle('hidden');
+            }
+        });
+
+        authSwitchMode.addEventListener('click', () => {
+            isSignUpMode = !isSignUpMode;
+            authTitle.innerText = isSignUpMode ? 'Create Account' : 'Sign In to Sync';
+            authSubmitBtn.innerText = isSignUpMode ? 'Sign Up' : 'Login';
+            authSwitchMode.innerText = isSignUpMode ? 'Already have an account? Sign in' : 'Need account? Sign up';
+        });
+
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+
+            if (isSignUpMode) {
+                const { error } = await _supabase.auth.signUp({ email, password });
+                if (error) alert(error.message);
+                else alert('Check your email for confirmation (or sign in if disabled)');
+            } else {
+                const { error } = await _supabase.auth.signInWithPassword({ email, password });
+                if (error) alert(error.message);
+            }
+        });
+
+        async function fetchWorkouts() {
+            const { data, error } = await _supabase
+                .from('workouts')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching:', error);
+                return;
+            }
+            renderWorkouts(data);
+        }
+
+        function renderWorkouts(workouts) {
+            workoutList.innerHTML = '';
+            if (!workouts || workouts.length === 0) {
+                workoutList.innerHTML = '<p class="text-zinc-500 text-xs text-center py-4">No workouts logged yet.</p>';
+                streakCount.innerText = '0 Days';
+                totalCount.innerText = '0';
+                return;
+            }
+
+            workouts.forEach((item) => {
+                const setsFormatted = item.sets_data.map((s, i) => `S${i+1}: ${s.weight}lbs × ${s.reps}`).join(' | ');
+                const div = document.createElement('div');
+                div.className = 'bg-zinc-950/50 border border-zinc-800/80 p-2.5 rounded-xl flex justify-between items-center text-xs';
+                div.innerHTML = `
+                    <div>
+                        <span class="font-semibold text-zinc-200">${item.exercise}</span>
+                        <div class="text-[10px] text-zinc-400 mt-0.5">${setsFormatted}</div>
+                    </div>
+                    <span class="text-[10px] text-zinc-500">${item.date}</span>
+                `;
+                workoutList.appendChild(div);
+            });
+
+            const uniqueDays = [...new Set(workouts.map(w => w.date))];
+            streakCount.innerText = `${uniqueDays.length} Days`;
+            totalCount.innerText = workouts.length;
+        }
+
+        workoutForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
+
+            const setRows = setsContainer.querySelectorAll('.set-row');
+            const setsDataArray = Array.from(setRows).map(row => ({
+                weight: parseFloat(row.querySelector('.set-weight').value) || 0,
+                reps: parseInt(row.querySelector('.set-reps').value) || 0
+            }));
+
+            const newWorkout = {
+                user_id: currentUser.id,
+                exercise: exerciseNameInput.value,
+                sets_data: setsDataArray,
+                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+            };
+
+            const { error } = await _supabase.from('workouts').insert([newWorkout]);
+            if (error) {
+                alert('Error saving: ' + error.message);
+            } else {
+                workoutForm.reset();
+                setsContainer.innerHTML = '';
+                addSetRow();
+                fetchWorkouts();
+            }
+        });
+
+        checkUser();
+    </script>
+</body>
+</html>
