@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <meta name="theme-color" content="#09090b">
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col items-center justify-start pb-20 select-none">
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col items-center justify-start pb-24 select-none">
 
     <!-- Top Header Bar -->
     <header class="w-full max-w-md px-4 py-4 flex justify-between items-center border-b border-zinc-900 bg-zinc-950/80 sticky top-0 z-30 backdrop-blur">
@@ -40,7 +40,11 @@
                     <input type="password" id="auth-password" required placeholder="Password" 
                         class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-orange-500 text-zinc-200">
                     <button type="submit" id="auth-submit-btn" class="w-full bg-orange-500 hover:bg-orange-600 text-zinc-950 font-semibold py-2.5 rounded-xl text-xs transition">Login</button>
-                    <button type="button" id="auth-switch-mode" class="w-full text-center text-[11px] text-zinc-400 hover:underline">Need an account? Sign up</button>
+                    
+                    <div class="flex justify-between items-center pt-1">
+                        <button type="button" id="auth-switch-mode" class="text-[11px] text-zinc-400 hover:underline">Need an account? Sign up</button>
+                        <button type="button" id="forgot-password-btn" class="text-[11px] text-orange-400 hover:underline">Forgot password?</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -83,6 +87,16 @@
             <button onclick="switchTab('log')" class="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-100 font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition text-xs shadow-md">
                 <span>+</span> Log a workout
             </button>
+
+            <!-- Password Update Section (Appears when logged in) -->
+            <div id="password-update-card" class="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl space-y-3 hidden">
+                <h3 class="text-xs font-bold text-white uppercase tracking-wider">Security Settings</h3>
+                <input type="password" id="new-password-input" placeholder="New password (min 6 chars)" 
+                    class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-orange-500">
+                <button type="button" onclick="updatePassword()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 py-2 rounded-xl text-xs font-semibold transition">
+                    Update Password
+                </button>
+            </div>
 
             <!-- Recent Sessions Feed -->
             <div class="space-y-2.5 pt-2">
@@ -297,8 +311,10 @@
         const userPill = document.getElementById('user-pill');
         const headerGreeting = document.getElementById('header-greeting');
         const authSwitchMode = document.getElementById('auth-switch-mode');
+        const forgotPasswordBtn = document.getElementById('forgot-password-btn');
         const authModalTitle = document.getElementById('auth-modal-title');
         const authSubmitBtn = document.getElementById('auth-submit-btn');
+        const passwordUpdateCard = document.getElementById('password-update-card');
 
         authModalBtn.addEventListener('click', () => {
             if (currentUser) {
@@ -314,6 +330,24 @@
             authModalTitle.innerText = isSignUpMode ? 'Create Account' : 'Sign In to Cloud Sync';
             authSubmitBtn.innerText = isSignUpMode ? 'Sign Up' : 'Login';
             authSwitchMode.innerText = isSignUpMode ? 'Already have an account? Sign in' : 'Need an account? Sign up';
+        });
+
+        // Forgot Password Handler
+        forgotPasswordBtn.addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            if (!email) {
+                alert('Please enter your email address in the field above first, then click forgot password.');
+                return;
+            }
+            const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin,
+            });
+            if (error) {
+                alert('Error: ' + error.message);
+            } else {
+                alert('Password reset link sent! Check your email inbox.');
+                authModal.classList.add('hidden');
+            }
         });
 
         authForm.addEventListener('submit', async (e) => {
@@ -332,6 +366,22 @@
             }
         });
 
+        // Update Password Function
+        async function updatePassword() {
+            const newPassword = document.getElementById('new-password-input').value;
+            if (!newPassword || newPassword.length < 6) {
+                alert('Password must be at least 6 characters long.');
+                return;
+            }
+            const { error } = await _supabase.auth.updateUser({ password: newPassword });
+            if (error) {
+                alert('Error updating password: ' + error.message);
+            } else {
+                alert('Password successfully updated!');
+                document.getElementById('new-password-input').value = '';
+            }
+        }
+
         // Auth State Handler
         async function initAuth() {
             const { data: { session } } = await _supabase.auth.getSession();
@@ -345,11 +395,13 @@
                 userPill.innerText = currentUser.email;
                 authModalBtn.innerText = 'Sign Out';
                 headerGreeting.innerText = `Welcome back, ${currentUser.email.split('@')[0]}!`;
+                passwordUpdateCard.classList.remove('hidden');
                 fetchWorkouts();
             } else {
                 userPill.innerText = 'Not logged in';
                 authModalBtn.innerText = 'Sign In';
                 headerGreeting.innerText = 'Good morning.';
+                passwordUpdateCard.classList.add('hidden');
                 renderWorkouts([]);
             }
         }
