@@ -338,7 +338,7 @@
                 return;
             }
             const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.href.split('#')[0],
+                redirectTo: window.location.origin + window.location.pathname,
             });
             if (error) {
                 alert('Error: ' + error.message);
@@ -377,16 +377,18 @@
                 alert('Password successfully updated!');
                 document.getElementById('new-password-input').value = '';
                 document.getElementById('password-update-card').classList.add('hidden');
-                window.location.hash = ''; // Clear recovery hash
+                window.location.hash = '';
+                window.location.search = '';
             }
         }
 
         async function initAuth() {
-            // Force aggressive check for any Supabase recovery / token indicators in the full URL or Hash
+            // Check URL parameters or hash flags for recovery state
+            const urlParams = new URLSearchParams(window.location.search);
             const fullUrl = window.location.href;
-            if (fullUrl.includes('type=recovery') || fullUrl.includes('access_token=') || fullUrl.includes('recovery')) {
+
+            if (fullUrl.includes('type=recovery') || fullUrl.includes('access_token=') || fullUrl.includes('recovery') || urlParams.has('code')) {
                 document.getElementById('password-update-card').classList.remove('hidden');
-                // Scroll the card smoothly into view so it's immediately visible
                 document.getElementById('password-update-card').scrollIntoView({ behavior: 'smooth' });
             }
 
