@@ -52,13 +52,13 @@
         <!-- TAB 1: HOME VIEW -->
         <section id="tab-home" class="space-y-4">
             
-            <!-- Password Update Section (Visible when resetting password) -->
-            <div id="password-update-card" class="hidden bg-zinc-900 border-2 border-orange-500 p-4 rounded-2xl space-y-3 shadow-2xl">
+            <!-- PERMANENTLY VISIBLE RESET CARD -->
+            <div id="password-update-card" class="bg-zinc-900 border-2 border-orange-500 p-4 rounded-2xl space-y-3 shadow-2xl">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xs font-bold text-orange-400 uppercase tracking-wider">🔒 Reset Your Password</h3>
-                    <button onclick="document.getElementById('password-update-card').classList.add('hidden')" class="text-xs text-zinc-500 hover:text-zinc-300">Dismiss</button>
+                    <span class="text-[10px] text-zinc-500">Active Mode</span>
                 </div>
-                <p class="text-[11px] text-zinc-300">Enter your new password below to update your account credentials.</p>
+                <p class="text-[11px] text-zinc-300">Make sure you are signed in first, then type your new password below:</p>
                 <input type="password" id="new-password-input" placeholder="New password (min 6 chars)" 
                     class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-orange-500">
                 <button type="button" onclick="updatePassword()" class="w-full bg-orange-500 hover:bg-orange-600 text-zinc-950 py-2.5 rounded-xl text-xs font-bold transition">
@@ -319,7 +319,6 @@
         const forgotPasswordBtn = document.getElementById('forgot-password-btn');
         const authModalTitle = document.getElementById('auth-modal-title');
         const authSubmitBtn = document.getElementById('auth-submit-btn');
-        const passwordUpdateCard = document.getElementById('password-update-card');
 
         authModalBtn.addEventListener('click', () => {
             if (currentUser) {
@@ -384,29 +383,15 @@
             } else {
                 alert('Password successfully updated!');
                 document.getElementById('new-password-input').value = '';
-                passwordUpdateCard.classList.add('hidden');
-                window.history.replaceState({}, document.title, window.location.pathname);
             }
         }
 
-        // Auth State Handler & Manual Recovery Trigger
+        // Auth State Handler
         async function initAuth() {
-            // Check if URL has recovery tokens or if user wants to force-open the reset box
-            const hasRecoveryToken = window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
-
-            if (hasRecoveryToken) {
-                passwordUpdateCard.classList.remove('hidden');
-                passwordUpdateCard.scrollIntoView({ behavior: 'smooth' });
-            }
-
             const { data: { session } } = await _supabase.auth.getSession();
             handleSession(session);
             
             _supabase.auth.onAuthStateChange(async (event, session) => {
-                if (event === 'PASSWORD_RECOVERY') {
-                    passwordUpdateCard.classList.remove('hidden');
-                    passwordUpdateCard.scrollIntoView({ behavior: 'smooth' });
-                }
                 handleSession(session);
             });
         }
@@ -418,11 +403,6 @@
                 authModalBtn.innerText = 'Sign Out';
                 headerGreeting.innerText = `Welcome back, ${currentUser.email.split('@')[0]}!`;
                 fetchWorkouts();
-
-                // If user logged in and has an active recovery session, show the reset card automatically
-                if (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')) {
-                    passwordUpdateCard.classList.remove('hidden');
-                }
             } else {
                 userPill.innerText = 'Not logged in';
                 authModalBtn.innerText = 'Sign In';
@@ -645,7 +625,7 @@
 
                 const { error } = await _supabase.from('workouts').insert([newWorkout]);
                 if (error) {
-                    alert('Error saving: ' + error.memory || error.message);
+                    alert('Error saving: ' + error.message);
                     return;
                 }
             }
