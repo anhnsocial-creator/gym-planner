@@ -10,9 +10,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <meta name="theme-color" content="#09090b">
 </head>
-<body id="app-body" class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col items-center justify-start pb-24 md:pb-12 select-none accent-orange-500 transition-colors duration-200">
+<body id="app-body" class="bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen flex flex-col items-center justify-start pb-24 md:pb-12 select-none transition-colors duration-200">
 
-    <!-- Top Header Bar (Expands nicely on desktop) -->
+    <!-- Top Header Bar -->
     <header class="w-full max-w-md md:max-w-6xl px-4 py-4 flex justify-between items-center border-b border-zinc-200 dark:border-zinc-900 bg-white/80 dark:bg-zinc-950/80 sticky top-0 z-30 backdrop-blur transition-colors duration-200">
         <div>
             <h1 class="text-xs font-semibold text-zinc-500 dark:text-zinc-400">YOUR TRAINING</h1>
@@ -43,7 +43,7 @@
                         class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-current text-zinc-900 dark:text-zinc-200">
                     <input type="password" id="auth-password" required placeholder="Password" 
                         class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-current text-zinc-900 dark:text-zinc-200">
-                    <button type="submit" id="auth-submit-btn" class="w-full theme-bg text-zinc-950 font-semibold py-2.5 rounded-xl text-xs transition">Login</button>
+                    <button type="submit" id="auth-submit-btn" class="w-full theme-bg text-white font-semibold py-2.5 rounded-xl text-xs transition">Login</button>
                     
                     <div class="flex justify-between items-center pt-1">
                         <button type="button" id="auth-switch-mode" class="text-[11px] text-zinc-500 dark:text-zinc-400 hover:underline">Need an account? Sign up</button>
@@ -55,7 +55,7 @@
         <!-- COLUMN 1: DASHBOARD & FEED (Home Tab) -->
         <section id="tab-home" class="space-y-4 md:block">
             <!-- Streak & Volume Hero Card -->
-            <div class="theme-gradient rounded-2xl p-5 text-zinc-950 shadow-lg relative overflow-hidden">
+            <div class="theme-gradient rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
                 <div class="absolute -right-4 -bottom-4 opacity-25 font-black text-7xl pointer-events-none">⚡</div>
                 <div class="flex justify-between items-start mb-4">
                     <span class="text-xs font-bold uppercase tracking-wider bg-black/20 text-white px-2.5 py-1 rounded-full">Streak & Volume</span>
@@ -87,7 +87,7 @@
             </div>
 
             <!-- Quick Action Button -->
-            <button onclick="switchTab('workouts')" class="md:hidden w-full bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition text-xs shadow-md">
+            <button onclick="switchTab('workouts')" class="md:hidden w-full bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition text-xs shadow-md">
                 <span>+</span> Log a workout & view exercises
             </button>
 
@@ -95,7 +95,7 @@
             <div class="space-y-2.5 pt-2">
                 <h3 class="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Recent sessions</h3>
                 <div id="recent-sessions-list" class="space-y-2">
-                    <div class="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 text-center space-y-2">
+                    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 text-center space-y-2 shadow-sm">
                         <span class="text-2xl">📋</span>
                         <h4 class="text-xs font-bold text-zinc-700 dark:text-zinc-300">No sessions yet</h4>
                         <p class="text-[11px] text-zinc-500">Log your first session and start building your streak.</p>
@@ -128,7 +128,7 @@
 
                     <!-- Category Filter Pills -->
                     <div class="flex gap-1.5 overflow-x-auto pb-1 text-[11px]">
-                        <button onclick="filterExercises('All')" class="filter-pill theme-bg text-zinc-950 font-semibold px-3 py-1 rounded-full whitespace-nowrap transition">All</button>
+                        <button onclick="filterExercises('All')" class="filter-pill theme-bg text-white font-semibold px-3 py-1 rounded-full whitespace-nowrap transition">All</button>
                         <button onclick="filterExercises('Free weight')" class="filter-pill bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-3 py-1 rounded-full whitespace-nowrap transition">Free weight</button>
                         <button onclick="filterExercises('Machine')" class="filter-pill bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-3 py-1 rounded-full whitespace-nowrap transition">Machine</button>
                         <button onclick="filterExercises('Cables')" class="filter-pill bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-3 py-1 rounded-full whitespace-nowrap transition">Cables</button>
@@ -145,7 +145,7 @@
                     <div id="builder-rows" class="space-y-2"></div>
                 </div>
 
-                <button id="save-workout-btn" onclick="saveWorkout()" class="w-full theme-bg text-zinc-950 font-semibold py-3 rounded-xl text-xs transition disabled:opacity-40 disabled:pointer-events-none">
+                <button id="save-workout-btn" onclick="saveWorkout()" class="w-full theme-bg text-white font-semibold py-3 rounded-xl text-xs transition disabled:opacity-40 disabled:pointer-events-none">
                     Save Workout to Cloud
                 </button>
             </div>
@@ -160,15 +160,13 @@
                         <h2 class="text-base font-bold text-zinc-900 dark:text-white">Routines</h2>
                         <p class="text-xs text-zinc-500 dark:text-zinc-400">Your reliable sessions, ready when you are.</p>
                     </div>
-                    <button onclick="openCustomRoutineModal()" class="text-xs bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 px-3 py-1.5 rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-800 transition font-semibold">
+                    <button onclick="openCustomRoutineModal()" class="text-xs bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 px-3 py-1.5 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition font-semibold shadow-sm">
                         + Custom Routine
                     </button>
                 </div>
 
                 <!-- Routines Container List -->
-                <div id="routines-list-container" class="space-y-3">
-                    <!-- Default pre-loaded routines will be rendered alongside user custom routines -->
-                </div>
+                <div id="routines-list-container" class="space-y-3"></div>
             </section>
 
             <!-- TAB 4: SETTINGS VIEW -->
@@ -182,33 +180,19 @@
                 <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl space-y-3 shadow-sm">
                     <h3 class="text-xs font-bold uppercase tracking-wider theme-text">🌗 Display Mode</h3>
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="setMode('dark')" id="mode-dark-btn" class="p-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-zinc-800 dark:text-zinc-200 flex items-center justify-center gap-1.5 transition">🌙 Dark Mode</button>
-                        <button onclick="setMode('light')" id="mode-light-btn" class="p-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-zinc-800 dark:text-zinc-200 flex items-center justify-center gap-1.5 transition">☀️ Light Mode</button>
+                        <button onclick="setMode('dark')" id="mode-dark-btn" class="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-zinc-800 dark:text-zinc-200 flex items-center justify-center gap-1.5 transition">🌙 Dark Mode</button>
+                        <button onclick="setMode('light')" id="mode-light-btn" class="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-zinc-800 dark:text-zinc-200 flex items-center justify-center gap-1.5 transition">☀️ Light Mode</button>
                     </div>
                 </div>
 
-                <!-- Theme Picker -->
+                <!-- Color Wheel Accent Picker -->
                 <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl space-y-3 shadow-sm">
-                    <h3 class="text-xs font-bold uppercase tracking-wider theme-text">🎨 App Theme Accent</h3>
-                    <div class="grid grid-cols-3 gap-2">
-                        <button onclick="setTheme('orange')" class="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-orange-500 flex items-center justify-center gap-1.5 hover:border-orange-500 transition">
-                            <span class="w-3 h-3 rounded-full bg-orange-500"></span> Orange
-                        </button>
-                        <button onclick="setTheme('emerald')" class="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-emerald-500 flex items-center justify-center gap-1.5 hover:border-emerald-500 transition">
-                            <span class="w-3 h-3 rounded-full bg-emerald-500"></span> Emerald
-                        </button>
-                        <button onclick="setTheme('indigo')" class="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-indigo-500 flex items-center justify-center gap-1.5 hover:border-indigo-500 transition">
-                            <span class="w-3 h-3 rounded-full bg-indigo-500"></span> Indigo
-                        </button>
-                        <button onclick="setTheme('violet')" class="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-violet-500 flex items-center justify-center gap-1.5 hover:border-violet-500 transition">
-                            <span class="w-3 h-3 rounded-full bg-violet-500"></span> Violet
-                        </button>
-                        <button onclick="setTheme('cyan')" class="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-cyan-500 flex items-center justify-center gap-1.5 hover:border-cyan-500 transition">
-                            <span class="w-3 h-3 rounded-full bg-cyan-500"></span> Cyan
-                        </button>
-                        <button onclick="setTheme('rose')" class="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-rose-500 flex items-center justify-center gap-1.5 hover:border-rose-500 transition">
-                            <span class="w-3 h-3 rounded-full bg-rose-500"></span> Rose
-                        </button>
+                    <h3 class="text-xs font-bold uppercase tracking-wider theme-text">🎨 Custom Accent Color</h3>
+                    <div class="flex items-center gap-3">
+                        <input type="color" id="color-wheel" onchange="setCustomThemeColor(this.value)" value="#f97316" class="w-12 h-10 rounded-xl cursor-pointer bg-transparent border border-zinc-200 dark:border-zinc-700 p-1">
+                        <div class="text-xs text-zinc-500 dark:text-zinc-400">
+                            Pick any color from the color wheel to dynamically update your theme.
+                        </div>
                     </div>
                 </div>
 
@@ -252,7 +236,7 @@
                     <label class="block text-[10px] uppercase font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Exercises (Comma separated)</label>
                     <input type="text" id="custom-routine-exercises" placeholder="e.g. Barbell Squat, Leg Extension Machine" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-200 focus:outline-none focus:border-current">
                 </div>
-                <button onclick="saveCustomRoutine()" class="w-full theme-bg text-zinc-950 font-semibold py-2.5 rounded-xl text-xs transition">Save Routine to Cloud</button>
+                <button onclick="saveCustomRoutine()" class="w-full theme-bg text-white font-semibold py-2.5 rounded-xl text-xs transition">Save Routine to Cloud</button>
             </div>
         </div>
     </div>
@@ -294,17 +278,14 @@
 
     <!-- Dynamic Theme Stylesheet Injector -->
     <style>
-        .theme-orange { --theme-color: #f97316; --theme-gradient: linear-gradient(to bottom right, #ea580c, #d97706); }
-        .theme-emerald { --theme-color: #10b981; --theme-gradient: linear-gradient(to bottom right, #059669, #0d9488); }
-        .theme-indigo { --theme-color: #6366f1; --theme-gradient: linear-gradient(to bottom right, #4f46e5, #7c3aed); }
-        .theme-violet { --theme-color: #8b5cf6; --theme-gradient: linear-gradient(to bottom right, #7c3aed, #c084fc); }
-        .theme-cyan { --theme-color: #06b6d4; --theme-gradient: linear-gradient(to bottom right, #0891b2, #22d3ee); }
-        .theme-rose { --theme-color: #f43f5e; --theme-gradient: linear-gradient(to bottom right, #e11d48, #fb7185); }
-
-        .theme-bg { background-color: var(--theme-color, #f97316); }
-        .theme-text { color: var(--theme-color, #f97316); }
-        .theme-gradient { background: var(--theme-gradient, linear-gradient(to bottom right, #ea580c, #d97706)); }
-        input:focus { border-color: var(--theme-color, #f97316) !important; }
+        :root {
+            --theme-color: #f97316;
+            --theme-gradient: linear-gradient(to bottom right, #ea580c, #d97706);
+        }
+        .theme-bg { background-color: var(--theme-color); }
+        .theme-text { color: var(--theme-color); }
+        .theme-gradient { background: var(--theme-gradient); }
+        input:focus { border-color: var(--theme-color) !important; }
     </style>
 
     <!-- App Script -->
@@ -317,10 +298,10 @@
 
         let currentUser = null;
         let isSignUpMode = false;
-        let currentTheme = localStorage.getItem('liftpulse_theme') || 'orange';
+        let currentThemeColor = localStorage.getItem('liftpulse_custom_color') || '#f97316';
         let currentMode = localStorage.getItem('liftpulse_mode') || 'dark';
 
-        setTheme(currentTheme, false);
+        setCustomThemeColor(currentThemeColor, false);
         setMode(currentMode, false);
 
         const EXERCISE_LIBRARY = [
@@ -349,14 +330,15 @@
         let selectedExercises = [];
         let customRoutines = [];
 
-        function setTheme(themeName, save = true) {
-            currentTheme = themeName;
-            if (save) localStorage.setItem('liftpulse_theme', themeName);
-            const body = document.getElementById('app-body');
-            body.className = `bg-zinc-950 text-zinc-100 min-h-screen flex flex-col items-center justify-start pb-24 md:pb-12 select-none theme-${themeName} transition-colors duration-200`;
-            if (currentMode === 'light') {
-                body.className = `bg-zinc-50 text-zinc-900 min-h-screen flex flex-col items-center justify-start pb-24 md:pb-12 select-none theme-${themeName} transition-colors duration-200`;
-            }
+        function setCustomThemeColor(hexColor, save = true) {
+            currentThemeColor = hexColor;
+            if (save) localStorage.setItem('liftpulse_custom_color', hexColor);
+            
+            document.documentElement.style.setProperty('--theme-color', hexColor);
+            document.documentElement.style.setProperty('--theme-gradient', `linear-gradient(to bottom right, ${hexColor}, #27272a)`);
+            
+            const colorPicker = document.getElementById('color-wheel');
+            if (colorPicker) colorPicker.value = hexColor;
         }
 
         function setMode(mode, save = true) {
@@ -372,7 +354,6 @@
                 htmlRoot.classList.add('dark');
                 modeIcon.innerText = '☀️';
             }
-            setTheme(currentTheme, false);
         }
 
         function toggleDarkMode() {
@@ -483,15 +464,15 @@
             filtered.forEach(ex => {
                 const isSelected = selectedExercises.some(s => s.name === ex.name);
                 const div = document.createElement('div');
-                div.className = `p-3 rounded-xl border flex justify-between items-center cursor-pointer transition ${isSelected ? 'theme-bg/10 border-current text-zinc-900 dark:text-white' : 'bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-700'}`;
+                div.className = `p-3 rounded-xl border flex justify-between items-center cursor-pointer transition ${isSelected ? 'theme-bg/10 border-current text-zinc-900 dark:text-white' : 'bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-700'}`;
                 div.innerHTML = `
                     <div onclick="toggleExerciseSelection('${ex.name}')" class="flex-1">
                         <h4 class="text-xs font-semibold">${ex.name}</h4>
                         <span class="text-[10px] text-zinc-500">${ex.muscle} • ${ex.category}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button type="button" onclick="openVideoModal('${ex.name}')" class="text-[10px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 px-2.5 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">▶ Demo</button>
-                        <button type="button" onclick="toggleExerciseSelection('${ex.name}')" class="text-xs font-bold px-2.5 py-1.5 rounded-lg ${isSelected ? 'theme-bg text-zinc-950' : 'bg-zinc-200 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-400'}">${isSelected ? 'Added ✓' : '+ Add'}</button>
+                        <button type="button" onclick="openVideoModal('${ex.name}')" class="text-[10px] bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 px-2.5 py-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800 transition">▶ Demo</button>
+                        <button type="button" onclick="toggleExerciseSelection('${ex.name}')" class="text-xs font-bold px-2.5 py-1.5 rounded-lg ${isSelected ? 'theme-bg text-white' : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-400'}">${isSelected ? 'Added ✓' : '+ Add'}</button>
                     </div>
                 `;
                 container.appendChild(div);
@@ -501,7 +482,7 @@
         function filterExercises(category) {
             document.querySelectorAll('.filter-pill').forEach(btn => {
                 if (btn.innerText.includes(category)) {
-                    btn.className = 'filter-pill theme-bg text-zinc-950 font-semibold px-3 py-1 rounded-full whitespace-nowrap transition';
+                    btn.className = 'filter-pill theme-bg text-white font-semibold px-3 py-1 rounded-full whitespace-nowrap transition';
                 } else {
                     btn.className = 'filter-pill bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-3 py-1 rounded-full whitespace-nowrap transition';
                 }
@@ -552,7 +533,7 @@
 
             selectedExercises.forEach((ex, exIdx) => {
                 const block = document.createElement('div');
-                block.className = 'bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-3 rounded-xl space-y-2';
+                block.className = 'bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-3 rounded-xl space-y-2 shadow-sm';
                 block.innerHTML = `
                     <div class="flex justify-between items-center">
                         <span class="text-xs font-bold theme-text">${ex.name}</span>
@@ -568,9 +549,9 @@
                     setRow.className = 'flex items-center gap-2';
                     setRow.innerHTML = `
                         <span class="text-[10px] text-zinc-500 w-8">Set ${setIdx + 1}</span>
-                        <input type="number" placeholder="Lbs" value="${set.weight}" onchange="updateSetVal(${exIdx}, ${setIdx}, 'weight', this.value)" class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded px-2 py-1 text-xs text-center text-zinc-900 dark:text-white focus:outline-none">
+                        <input type="number" placeholder="Lbs" value="${set.weight}" onchange="updateSetVal(${exIdx}, ${setIdx}, 'weight', this.value)" class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded px-2 py-1 text-xs text-center text-zinc-900 dark:text-white focus:outline-none">
                         <span class="text-zinc-400">×</span>
-                        <input type="number" placeholder="Reps" value="${set.reps}" onchange="updateSetVal(${exIdx}, ${setIdx}, 'reps', this.value)" class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded px-2 py-1 text-xs text-center text-zinc-900 dark:text-white focus:outline-none">
+                        <input type="number" placeholder="Reps" value="${set.reps}" onchange="updateSetVal(${exIdx}, ${setIdx}, 'reps', this.value)" class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded px-2 py-1 text-xs text-center text-zinc-900 dark:text-white focus:outline-none">
                     `;
                     setsList.appendChild(setRow);
                 });
@@ -611,7 +592,7 @@
 
             if (!workouts || workouts.length === 0) {
                 recentList.innerHTML = `
-                    <div class="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 text-center space-y-2">
+                    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 text-center space-y-2 shadow-sm">
                         <span class="text-2xl">📋</span>
                         <h4 class="text-xs font-bold text-zinc-700 dark:text-zinc-300">No sessions yet</h4>
                         <p class="text-[11px] text-zinc-500">Log your first session and start building your streak.</p>
@@ -677,7 +658,6 @@
             fetchWorkouts();
         }
 
-        // CUSTOM ROUTINES LOGIC
         async function fetchCustomRoutines() {
             if (!currentUser) return;
             const { data, error } = await _supabase
@@ -695,7 +675,6 @@
             const container = document.getElementById('routines-list-container');
             container.innerHTML = '';
 
-            // Default Starter Routines
             const defaults = [
                 { title: 'Push / Pull / Legs', category: 'Starter plan', desc: 'A balanced weekly split featuring compound lifts, RDLs, Face Pulls, and cable accessories.', exercises: ['Barbell Bench Press', 'Romanian Deadlift (RDL)', 'Face Pull'] },
                 { title: 'Upper Body Unilateral Focus', category: 'Starter plan', desc: 'High frequency upper body movements focusing on one-arm tricep extensions, hammer curls, and rows.', exercises: ['One-Arm Tricep Extension', 'Hammer Curl', 'Seated Cable Row'] }
@@ -718,7 +697,6 @@
                 container.appendChild(card);
             });
 
-            // User Custom Routines
             userRoutines.forEach(r => {
                 const card = document.createElement('div');
                 card.className = 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 space-y-2 shadow-sm relative';
