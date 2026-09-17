@@ -43,7 +43,6 @@
                     
                     <div class="flex justify-between items-center pt-1">
                         <button type="button" id="auth-switch-mode" class="text-[11px] text-zinc-400 hover:underline">Need an account? Sign up</button>
-                        <button type="button" id="forgot-password-btn" class="text-[11px] text-orange-400 hover:underline">Forgot password?</button>
                     </div>
                 </form>
             </div>
@@ -51,21 +50,6 @@
 
         <!-- TAB 1: HOME VIEW -->
         <section id="tab-home" class="space-y-4">
-            
-            <!-- PASSWORD RESET CARD (Hidden by default, shows automatically on password recovery link click) -->
-            <div id="password-update-card" class="hidden bg-zinc-900 border-2 border-orange-500 p-4 rounded-2xl space-y-3 shadow-2xl">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-xs font-bold text-orange-400 uppercase tracking-wider">🔒 Reset Your Password</h3>
-                    <span class="text-[10px] text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full font-semibold">Recovery Mode</span>
-                </div>
-                <p class="text-[11px] text-zinc-300">Enter your new secure password below:</p>
-                <input type="password" id="new-password-input" placeholder="New password (min 6 chars)" 
-                    class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-orange-500">
-                <button type="button" onclick="updatePassword()" class="w-full bg-orange-500 hover:bg-orange-600 text-zinc-950 py-2.5 rounded-xl text-xs font-bold transition">
-                    Update Password Now
-                </button>
-            </div>
-
             <!-- Streak Hero Card -->
             <div class="bg-gradient-to-br from-orange-600 to-amber-600 rounded-2xl p-5 text-zinc-950 shadow-lg relative overflow-hidden">
                 <div class="absolute -right-4 -bottom-4 text-orange-700/30 font-black text-7xl pointer-events-none">⚡</div>
@@ -197,49 +181,31 @@
                     <p class="text-xs text-zinc-400">Big compound movements when time is tight.</p>
                     <button onclick="loadRoutine('Full Body Strength')" class="w-full mt-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 py-2 rounded-xl text-xs font-semibold transition">Start routine</button>
                 </div>
-
-                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 space-y-2">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-[10px] bg-orange-500/10 text-orange-400 font-semibold px-2 py-0.5 rounded">Starter plan</span>
-                            <h3 class="text-sm font-bold text-white mt-1">Bodymovement Foundation</h3>
-                        </div>
-                        <span class="text-lg">🤸</span>
-                    </div>
-                    <p class="text-xs text-zinc-400">A no-equipment session you can do anywhere.</p>
-                    <button onclick="loadRoutine('Bodymovement Foundation')" class="w-full mt-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 py-2 rounded-xl text-xs font-semibold transition">Start routine</button>
-                </div>
             </div>
         </section>
 
-        <!-- TAB 4: HISTORY VIEW -->
-        <section id="tab-history" class="hidden space-y-4">
+        <!-- TAB 4: SETTINGS VIEW (Direct Password Change & Account info) -->
+        <section id="tab-settings" class="hidden space-y-4">
             <div>
-                <h2 class="text-base font-bold text-white">History</h2>
-                <p class="text-xs text-zinc-400">Every session is proof you showed up.</p>
+                <h2 class="text-base font-bold text-white">Settings</h2>
+                <p class="text-xs text-zinc-400">Manage account access and preferences.</p>
             </div>
 
-            <!-- History Stats Summary -->
-            <div class="grid grid-cols-3 gap-2.5">
-                <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-2xl text-center">
-                    <span id="history-sessions-count" class="block text-lg font-bold text-white">0</span>
-                    <span class="text-[10px] text-zinc-400 uppercase tracking-wider">Sessions</span>
+            <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl space-y-4">
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-orange-400 mb-1">🔒 Change Password</h3>
+                    <p class="text-[11px] text-zinc-400">Update your password instantly across all your devices.</p>
                 </div>
-                <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-2xl text-center">
-                    <span id="history-sets-count" class="block text-lg font-bold text-white">0</span>
-                    <span class="text-[10px] text-zinc-400 uppercase tracking-wider">Sets logged</span>
-                </div>
-                <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-2xl text-center">
-                    <span id="history-muscles-count" class="block text-lg font-bold text-white">0</span>
-                    <span class="text-[10px] text-zinc-400 uppercase tracking-wider">Exercises</span>
-                </div>
-            </div>
 
-            <div id="full-history-list" class="space-y-2.5 pt-2">
-                <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-8 text-center space-y-2">
-                    <span class="text-3xl">📅</span>
-                    <h3 class="text-xs font-bold text-zinc-300">Your history starts here</h3>
-                    <p class="text-[11px] text-zinc-500">Once you save a workout, it will show up in this timeline.</p>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">New Password</label>
+                        <input type="password" id="settings-new-password" placeholder="At least 6 characters" 
+                            class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-orange-500">
+                    </div>
+                    <button type="button" onclick="changePasswordDirectly()" class="w-full bg-orange-500 hover:bg-orange-600 text-zinc-950 font-semibold py-2.5 rounded-xl text-xs transition">
+                        Update Password
+                    </button>
                 </div>
             </div>
         </section>
@@ -254,15 +220,15 @@
         </button>
         <button onclick="switchTab('log')" id="nav-log" class="nav-btn flex flex-col items-center text-zinc-400 hover:text-zinc-200 transition">
             <span class="text-lg">⚡</span>
-            <span class="text-[10px] font-medium mt-0.5">Log workout</span>
+            <span class="text-[10px] font-medium mt-0.5">Log</span>
         </button>
         <button onclick="switchTab('routines')" id="nav-routines" class="nav-btn flex flex-col items-center text-zinc-400 hover:text-zinc-200 transition">
             <span class="text-lg">📋</span>
             <span class="text-[10px] font-medium mt-0.5">Routines</span>
         </button>
-        <button onclick="switchTab('history')" id="nav-history" class="nav-btn flex flex-col items-center text-zinc-400 hover:text-zinc-200 transition">
-            <span class="text-lg">📊</span>
-            <span class="text-[10px] font-medium mt-0.5">History</span>
+        <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center text-zinc-400 hover:text-zinc-200 transition">
+            <span class="text-lg">⚙️</span>
+            <span class="text-[10px] font-medium mt-0.5">Settings</span>
         </button>
     </nav>
 
@@ -295,7 +261,7 @@
         let selectedExercises = [];
 
         function switchTab(tabId) {
-            ['home', 'log', 'routines', 'history'].forEach(t => {
+            ['home', 'log', 'routines', 'settings'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
                 document.getElementById(`nav-${t}`).className = 'nav-btn flex flex-col items-center text-zinc-400 hover:text-zinc-200 transition';
             });
@@ -311,7 +277,6 @@
         const userPill = document.getElementById('user-pill');
         const headerGreeting = document.getElementById('header-greeting');
         const authSwitchMode = document.getElementById('auth-switch-mode');
-        const forgotPasswordBtn = document.getElementById('forgot-password-btn');
         const authModalTitle = document.getElementById('auth-modal-title');
         const authSubmitBtn = document.getElementById('auth-submit-btn');
 
@@ -331,23 +296,6 @@
             authSwitchMode.innerText = isSignUpMode ? 'Already have an account? Sign in' : 'Need an account? Sign up';
         });
 
-        forgotPasswordBtn.addEventListener('click', async () => {
-            const email = document.getElementById('auth-email').value;
-            if (!email) {
-                alert('Please enter your email address in the field above first, then click forgot password.');
-                return;
-            }
-            const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.origin + window.location.pathname,
-            });
-            if (error) {
-                alert('Error: ' + error.message);
-            } else {
-                alert('Password reset link sent! Check your email inbox.');
-                authModal.classList.add('hidden');
-            }
-        });
-
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('auth-email').value;
@@ -364,42 +312,33 @@
             }
         });
 
-        async function updatePassword() {
-            const newPassword = document.getElementById('new-password-input').value;
-            if (!newPassword || newPassword.length < 6) {
+        async function changePasswordDirectly() {
+            if (!currentUser) {
+                alert('You must be signed in to change your password.');
+                authModal.classList.remove('hidden');
+                return;
+            }
+
+            const newPass = document.getElementById('settings-new-password').value;
+            if (!newPass || newPass.length < 6) {
                 alert('Password must be at least 6 characters long.');
                 return;
             }
-            const { error } = await _supabase.auth.updateUser({ password: newPassword });
+
+            const { error } = await _supabase.auth.updateUser({ password: newPass });
             if (error) {
                 alert('Error updating password: ' + error.message);
             } else {
-                alert('Password successfully updated!');
-                document.getElementById('new-password-input').value = '';
-                document.getElementById('password-update-card').classList.add('hidden');
-                window.location.hash = '';
-                window.location.search = '';
+                alert('Password updated successfully! This will apply to your account on all devices.');
+                document.getElementById('settings-new-password').value = '';
             }
         }
 
         async function initAuth() {
-            // Check URL parameters or hash flags for recovery state
-            const urlParams = new URLSearchParams(window.location.search);
-            const fullUrl = window.location.href;
-
-            if (fullUrl.includes('type=recovery') || fullUrl.includes('access_token=') || fullUrl.includes('recovery') || urlParams.has('code')) {
-                document.getElementById('password-update-card').classList.remove('hidden');
-                document.getElementById('password-update-card').scrollIntoView({ behavior: 'smooth' });
-            }
-
             const { data: { session } } = await _supabase.auth.getSession();
             handleSession(session);
             
             _supabase.auth.onAuthStateChange(async (event, session) => {
-                if (event === 'PASSWORD_RECOVERY') {
-                    document.getElementById('password-update-card').classList.remove('hidden');
-                    document.getElementById('password-update-card').scrollIntoView({ behavior: 'smooth' });
-                }
                 handleSession(session);
             });
         }
@@ -537,10 +476,7 @@
 
         function renderWorkouts(workouts) {
             const recentList = document.getElementById('recent-sessions-list');
-            const fullList = document.getElementById('full-history-list');
-
             recentList.innerHTML = '';
-            fullList.innerHTML = '';
 
             if (!workouts || workouts.length === 0) {
                 recentList.innerHTML = `
@@ -549,36 +485,21 @@
                         <h4 class="text-xs font-bold text-zinc-300">No sessions yet</h4>
                         <p class="text-[11px] text-zinc-500">Log your first session and start building your streak.</p>
                     </div>`;
-                fullList.innerHTML = `
-                    <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-8 text-center space-y-2">
-                        <span class="text-3xl">📅</span>
-                        <h3 class="text-xs font-bold text-zinc-300">Your history starts here</h3>
-                        <p class="text-[11px] text-zinc-500">Once you save a workout, it will show up in this timeline.</p>
-                    </div>`;
                 document.getElementById('streak-sessions').innerText = '0 sessions';
                 document.getElementById('stat-total-sessions').innerText = '0';
                 document.getElementById('stat-total-volume').innerText = '0';
-                document.getElementById('history-sessions-count').innerText = '0';
-                document.getElementById('history-sets-count').innerText = '0';
-                document.getElementById('history-muscles-count').innerText = '0';
                 return;
             }
 
             let totalVolume = 0;
-            let totalSets = 0;
-
             workouts.forEach(item => {
                 const sets = item.sets_data || [];
                 sets.forEach(s => totalVolume += (s.weight * s.reps));
-                totalSets += sets.length;
             });
 
             document.getElementById('streak-sessions').innerText = `${workouts.length} sessions`;
             document.getElementById('stat-total-sessions').innerText = workouts.length;
             document.getElementById('stat-total-volume').innerText = totalVolume.toLocaleString();
-            document.getElementById('history-sessions-count').innerText = workouts.length;
-            document.getElementById('history-sets-count').innerText = totalSets;
-            document.getElementById('history-muscles-count').innerText = workouts.length;
 
             workouts.slice(0, 3).forEach(item => {
                 const div = document.createElement('div');
@@ -591,21 +512,6 @@
                     <span class="text-[10px] bg-zinc-800 text-zinc-300 px-2 py-1 rounded-lg">${item.date}</span>
                 `;
                 recentList.appendChild(div);
-            });
-
-            workouts.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'bg-zinc-900 border border-zinc-800 p-4 rounded-2xl space-y-2';
-                div.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <h4 class="text-xs font-bold text-white">${item.exercise}</h4>
-                        <span class="text-[10px] text-zinc-400">${item.date}</span>
-                    </div>
-                    <div class="text-[11px] text-zinc-300 bg-zinc-950 p-2 rounded-xl">
-                        ${item.sets_data.map((s, i) => `Set ${i+1}: ${s.weight} lbs × ${s.reps} reps`).join('<br>')}
-                    </div>
-                `;
-                fullList.appendChild(div);
             });
         }
 
@@ -645,12 +551,9 @@
             if (routineName === 'Push / Pull / Legs') {
                 selectedExercises.push({ name: 'Bench Press', sets: [{weight: 135, reps: 10}, {weight: 135, reps: 8}] });
                 selectedExercises.push({ name: 'Lat Pulldown', sets: [{weight: 120, reps: 10}] });
-            } else if (routineName === 'Full Body Strength') {
+            } else {
                 selectedExercises.push({ name: 'Barbell Squat', sets: [{weight: 185, reps: 5}] });
                 selectedExercises.push({ name: 'Shoulder Press', sets: [{weight: 95, reps: 8}] });
-            } else {
-                selectedExercises.push({ name: 'Push Ups', sets: [{weight: 0, rels: 20}] });
-                selectedExercises.push({ name: 'Pull Ups', sets: [{weight: 0, reps: 10}] });
             }
             document.getElementById('selected-count').innerText = `${selectedExercises.length} selected`;
             renderExerciseLibrary();
