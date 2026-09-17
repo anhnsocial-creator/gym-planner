@@ -86,6 +86,42 @@
                 </div>
             </div>
 
+            <!-- COLLAPSIBLE CALENDAR DROPDOWN SECTION -->
+            <div class="app-card border app-border rounded-2xl shadow-sm overflow-hidden transition-all duration-200">
+                <button onclick="toggleCalendarDropdown()" class="w-full p-4 flex justify-between items-center hover:opacity-80 transition text-left">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-base">🗓️</span>
+                        <div>
+                            <h3 class="text-xs font-bold uppercase tracking-wider app-text">Workout Calendar View</h3>
+                            <p class="text-[10px] app-text-muted">Tap to expand or hide your workout history</p>
+                        </div>
+                    </div>
+                    <span id="calendar-chevron" class="text-xs font-bold app-text-muted transition-transform duration-200">▼</span>
+                </button>
+                
+                <!-- Calendar Content Dropdown Body -->
+                <div id="calendar-dropdown-body" class="hidden p-4 pt-0 space-y-3 border-t app-border">
+                    <div class="flex justify-between items-center pt-3">
+                        <button onclick="changeCalendarMonth(-1)" class="p-1.5 rounded-lg app-card-sub border app-border app-text text-xs hover:opacity-80">◀ Prev</button>
+                        <span id="calendar-month-year" class="text-xs font-bold app-text">Month Year</span>
+                        <button onclick="changeCalendarMonth(1)" class="p-1.5 rounded-lg app-card-sub border app-border app-text text-xs hover:opacity-80">Next ▶</button>
+                    </div>
+
+                    <!-- Days Header -->
+                    <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-semibold app-text-muted">
+                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                    </div>
+
+                    <!-- Grid Days Container -->
+                    <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 text-center text-xs"></div>
+
+                    <div class="flex items-center justify-between pt-1 text-[10px] app-text-muted border-t app-border">
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full theme-bg inline-block"></span> Workout Completed</span>
+                        <span id="calendar-active-count">0 days active</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Quick Action Button -->
             <button onclick="switchTab('workouts')" class="md:hidden w-full app-card hover:opacity-90 border app-border app-text font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition text-xs shadow-md">
                 <span>+</span> Log a workout & view exercises
@@ -369,6 +405,78 @@
 
         let selectedExercises = [];
         let customRoutines = [];
+        let globalWorkoutsData = [];
+        let calendarCurrentDate = new Date();
+
+        function toggleCalendarDropdown() {
+            const body = document.getElementById('calendar-dropdown-body');
+            const chevron = document.getElementById('calendar-chevron');
+            body.classList.toggle('hidden');
+            if (!body.classList.contains('hidden')) {
+                chevron.style.transform = 'rotate(180deg)';
+                renderCalendar();
+            } else {
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function changeCalendarMonth(direction) {
+            calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const year = calendarCurrentDate.getFullYear();
+            const month = calendarCurrentDate.getMonth();
+
+            document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const daysGrid = document.getElementById('calendar-days-grid');
+            daysGrid.innerHTML = '';
+
+            // Extract set workout dates in YYYY-MM-DD or standard parsed format from globalWorkoutsData
+            const workoutDatesSet = new Set();
+            globalWorkoutsData.forEach(w => {
+                // w.date is stored like 'Sep 16, 2026' or ISO strings
+                const parsed = new Date(w.date || w.created_at);
+                if (!isNaN(parsed)) {
+                    const yyyyMmDd = `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}-${String(parsed.getDate()).padStart(2, '0')}`;
+                    workoutDatesSet.add(yyyyMmDd);
+                }
+            });
+
+            let activeDaysInMonth = 0;
+
+            // Blank padding for offset days before start of month
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyCell = document.createElement('div');
+                daysGrid.appendChild(emptyCell);
+            }
+
+            // Render days of the month
+            for (let day = 1; day <= totalDays; day++) {
+                const dayCell = document.createElement('div');
+                const formattedMonth = String(month + 1).padStart(2, '0');
+                const formattedDay = String(day).padStart(2, '0');
+                const dateKey = `${year}-${formattedMonth}-${formattedDay}`;
+
+                const hasWorkedOut = workoutDatesSet.has(dateKey);
+                if (hasWorkedOut) activeDaysInMonth++;
+
+                dayCell.className = `h-7 flex items-center justify-center rounded-lg text-xs transition font-medium ${
+                    hasWorkedOut 
+                        ? 'theme-bg text-white font-bold shadow-sm' 
+                        : 'app-card-sub app-text hover:opacity-80'
+                }`;
+                dayCell.innerText = day;
+                daysGrid.appendChild(dayCell);
+            }
+
+            document.getElementById('calendar-active-count').innerText = `${activeDaysInMonth} active days this month`;
+        }
 
         function setCustomThemeColor(hexColor, save = true) {
             currentThemeColor = hexColor;
@@ -623,7 +731,9 @@
                 .order('id', { ascending: false });
 
             if (error) { console.error('Error fetching workouts:', error); return; }
-            renderWorkouts(data);
+            globalWorkoutsData = data || [];
+            renderWorkouts(globalWorkoutsData);
+            renderCalendar();
         }
 
         function renderWorkouts(workouts) {
