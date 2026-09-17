@@ -52,13 +52,13 @@
         <!-- TAB 1: HOME VIEW -->
         <section id="tab-home" class="space-y-4">
             
-            <!-- PERMANENTLY VISIBLE RESET CARD -->
-            <div id="password-update-card" class="bg-zinc-900 border-2 border-orange-500 p-4 rounded-2xl space-y-3 shadow-2xl">
+            <!-- PASSWORD RESET CARD (Hidden by default, shows only on recovery link click) -->
+            <div id="password-update-card" class="hidden bg-zinc-900 border-2 border-orange-500 p-4 rounded-2xl space-y-3 shadow-2xl">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xs font-bold text-orange-400 uppercase tracking-wider">🔒 Reset Your Password</h3>
-                    <span class="text-[10px] text-zinc-500">Active Mode</span>
+                    <span class="text-[10px] text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full font-semibold">Recovery Mode</span>
                 </div>
-                <p class="text-[11px] text-zinc-300">Make sure you are signed in first, then type your new password below:</p>
+                <p class="text-[11px] text-zinc-300">Enter your new secure password below:</p>
                 <input type="password" id="new-password-input" placeholder="New password (min 6 chars)" 
                     class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-orange-500">
                 <button type="button" onclick="updatePassword()" class="w-full bg-orange-500 hover:bg-orange-600 text-zinc-950 py-2.5 rounded-xl text-xs font-bold transition">
@@ -383,15 +383,29 @@
             } else {
                 alert('Password successfully updated!');
                 document.getElementById('new-password-input').value = '';
+                // Hide the card again after successful update
+                document.getElementById('password-update-card').classList.add('hidden');
             }
         }
 
-        // Auth State Handler
+        // Auth State Handler & Recovery Detection
         async function initAuth() {
+            // Check if URL contains recovery tokens in hash or query params
+            const hash = window.location.hash;
+            const searchParams = new URLSearchParams(window.location.search);
+            
+            if (hash.includes('type=recovery') || searchParams.get('type') === 'recovery' || hash.includes('access_token')) {
+                // Automatically show the reset card if a recovery token is present
+                document.getElementById('password-update-card').classList.remove('hidden');
+            }
+
             const { data: { session } } = await _supabase.auth.getSession();
             handleSession(session);
             
             _supabase.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'PASSWORD_RECOVERY') {
+                    document.getElementById('password-update-card').classList.remove('hidden');
+                }
                 handleSession(session);
             });
         }
