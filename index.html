@@ -88,12 +88,15 @@
                 <span>+</span> Log a workout
             </button>
 
-            <!-- Password Update Section (Appears when logged in) -->
-            <div id="password-update-card" class="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl space-y-3 hidden">
-                <h3 class="text-xs font-bold text-white uppercase tracking-wider">Security Settings</h3>
+            <!-- Password Update Section (Highlighted/Appears on recovery or login) -->
+            <div id="password-update-card" class="bg-zinc-900 border border-orange-500/50 p-4 rounded-2xl space-y-3 hidden shadow-lg">
+                <div class="flex justify-between items-center">
+                    <h3 id="security-title" class="text-xs font-bold text-orange-400 uppercase tracking-wider">Security Settings</h3>
+                </div>
+                <p id="recovery-notice" class="text-[11px] text-zinc-400 hidden">Please enter your new password below to finish resetting it.</p>
                 <input type="password" id="new-password-input" placeholder="New password (min 6 chars)" 
                     class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-orange-500">
-                <button type="button" onclick="updatePassword()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 py-2 rounded-xl text-xs font-semibold transition">
+                <button type="button" onclick="updatePassword()" class="w-full bg-orange-500 hover:bg-orange-600 text-zinc-950 py-2 rounded-xl text-xs font-semibold transition">
                     Update Password
                 </button>
             </div>
@@ -273,6 +276,7 @@
 
         let currentUser = null;
         let isSignUpMode = false;
+        let isPasswordRecovery = false;
 
         // Expanded Exercise Database
         const EXERCISE_LIBRARY = [
@@ -315,6 +319,8 @@
         const authModalTitle = document.getElementById('auth-modal-title');
         const authSubmitBtn = document.getElementById('auth-submit-btn');
         const passwordUpdateCard = document.getElementById('password-update-card');
+        const securityTitle = document.getElementById('security-title');
+        const recoveryNotice = document.getElementById('recovery-notice');
 
         authModalBtn.addEventListener('click', () => {
             if (currentUser) {
@@ -379,14 +385,30 @@
             } else {
                 alert('Password successfully updated!');
                 document.getElementById('new-password-input').value = '';
+                isPasswordRecovery = false;
+                recoveryNotice.classList.add('hidden');
+                securityTitle.innerText = 'Security Settings';
+                // Clean URL hash
+                window.history.replaceState({}, document.title, window.location.pathname);
             }
         }
 
         // Auth State Handler
         async function initAuth() {
+            // Check if user came from a recovery link (URL contains type=recovery or access_token)
+            if (window.location.hash.includes('type=recovery') || window.location.hash.includes('access_token')) {
+                isPasswordRecovery = true;
+            }
+
             const { data: { session } } = await _supabase.auth.getSession();
             handleSession(session);
-            _supabase.auth.onAuthStateChange((_event, session) => handleSession(session));
+            
+            _supabase.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'PASSWORD_RECOVERY') {
+                    isPasswordRecovery = true;
+                }
+                handleSession(session);
+            });
         }
 
         function handleSession(session) {
@@ -395,7 +417,16 @@
                 userPill.innerText = currentUser.email;
                 authModalBtn.innerText = 'Sign Out';
                 headerGreeting.innerText = `Welcome back, ${currentUser.email.split('@')[0]}!`;
+                
+                // Show security card automatically if recovery mode is active
                 passwordUpdateCard.classList.remove('hidden');
+                if (isPasswordRecovery) {
+                    securityTitle.innerText = 'Reset Your Password';
+                    recoveryNotice.classList.remove('hidden');
+                    // Scroll card into view
+                    passwordUpdateCard.scrollIntoView({ behavior: 'smooth' });
+                }
+
                 fetchWorkouts();
             } else {
                 userPill.innerText = 'Not logged in';
