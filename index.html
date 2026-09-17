@@ -88,7 +88,7 @@
                 <span>+</span> Log a workout
             </button>
 
-            <!-- Password Update Section (Highlighted/Appears on recovery or login) -->
+            <!-- Password Update Section (Highlighted/Appears on recovery) -->
             <div id="password-update-card" class="bg-zinc-900 border border-orange-500/50 p-4 rounded-2xl space-y-3 hidden shadow-lg">
                 <div class="flex justify-between items-center">
                     <h3 id="security-title" class="text-xs font-bold text-orange-400 uppercase tracking-wider">Security Settings</h3>
@@ -388,7 +388,8 @@
                 isPasswordRecovery = false;
                 recoveryNotice.classList.add('hidden');
                 securityTitle.innerText = 'Security Settings';
-                // Clean URL hash
+                passwordUpdateCard.classList.add('hidden');
+                // Clean URL hash immediately
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         }
@@ -398,6 +399,8 @@
             // Check if user came from a recovery link (URL contains type=recovery or access_token)
             if (window.location.hash.includes('type=recovery') || window.location.hash.includes('access_token')) {
                 isPasswordRecovery = true;
+                // Immediately clean the URL hash so it doesn't loop on refresh/sign out
+                window.history.replaceState({}, document.title, window.location.pathname);
             }
 
             const { data: { session } } = await _supabase.auth.getSession();
@@ -406,6 +409,7 @@
             _supabase.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'PASSWORD_RECOVERY') {
                     isPasswordRecovery = true;
+                    window.history.replaceState({}, document.title, window.location.pathname);
                 }
                 handleSession(session);
             });
@@ -419,11 +423,10 @@
                 headerGreeting.innerText = `Welcome back, ${currentUser.email.split('@')[0]}!`;
                 
                 // Show security card automatically if recovery mode is active
-                passwordUpdateCard.classList.remove('hidden');
                 if (isPasswordRecovery) {
+                    passwordUpdateCard.classList.remove('hidden');
                     securityTitle.innerText = 'Reset Your Password';
                     recoveryNotice.classList.remove('hidden');
-                    // Scroll card into view
                     passwordUpdateCard.scrollIntoView({ behavior: 'smooth' });
                 }
 
@@ -586,7 +589,6 @@
                 return;
             }
 
-            // Calculate metrics
             let totalVolume = 0;
             let totalSets = 0;
 
@@ -603,7 +605,6 @@
             document.getElementById('history-sets-count').innerText = totalSets;
             document.getElementById('history-muscles-count').innerText = workouts.length;
 
-            // Render Recent (top 3)
             workouts.slice(0, 3).forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'bg-zinc-900 border border-zinc-800 p-3.5 rounded-2xl flex justify-between items-center';
@@ -617,7 +618,6 @@
                 recentList.appendChild(div);
             });
 
-            // Render Full History
             workouts.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'bg-zinc-900 border border-zinc-800 p-4 rounded-2xl space-y-2';
@@ -659,7 +659,6 @@
                 }
             }
 
-            // Reset form
             selectedExercises = [];
             renderExerciseLibrary();
             renderBuilderRows();
