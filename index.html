@@ -52,16 +52,17 @@
         <!-- TAB 1: HOME VIEW -->
         <section id="tab-home" class="space-y-4">
             
-            <!-- Password Update Section (Forced to the top during recovery) -->
-            <div id="password-update-card" class="bg-zinc-900 border-2 border-orange-500 p-4 rounded-2xl space-y-3 hidden shadow-2xl">
+            <!-- Password Update Section (Visible when resetting password) -->
+            <div id="password-update-card" class="hidden bg-zinc-900 border-2 border-orange-500 p-4 rounded-2xl space-y-3 shadow-2xl">
                 <div class="flex justify-between items-center">
-                    <h3 id="security-title" class="text-xs font-bold text-orange-400 uppercase tracking-wider">Reset Your Password</h3>
+                    <h3 class="text-xs font-bold text-orange-400 uppercase tracking-wider">🔒 Reset Your Password</h3>
+                    <button onclick="document.getElementById('password-update-card').classList.add('hidden')" class="text-xs text-zinc-500 hover:text-zinc-300">Dismiss</button>
                 </div>
-                <p id="recovery-notice" class="text-[11px] text-zinc-300">Please enter your new password below to finish resetting it.</p>
+                <p class="text-[11px] text-zinc-300">Enter your new password below to update your account credentials.</p>
                 <input type="password" id="new-password-input" placeholder="New password (min 6 chars)" 
                     class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-orange-500">
                 <button type="button" onclick="updatePassword()" class="w-full bg-orange-500 hover:bg-orange-600 text-zinc-950 py-2.5 rounded-xl text-xs font-bold transition">
-                    Update Password & Continue
+                    Update Password Now
                 </button>
             </div>
 
@@ -277,7 +278,6 @@
 
         let currentUser = null;
         let isSignUpMode = false;
-        let isPasswordRecovery = false;
 
         // Expanded Exercise Database
         const EXERCISE_LIBRARY = [
@@ -384,21 +384,19 @@
             } else {
                 alert('Password successfully updated!');
                 document.getElementById('new-password-input').value = '';
-                isPasswordRecovery = false;
                 passwordUpdateCard.classList.add('hidden');
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         }
 
-        // Auth State Handler & Immediate Recovery Check
+        // Auth State Handler & Manual Recovery Trigger
         async function initAuth() {
-            // Check immediately if URL has recovery indicators
-            if (window.location.hash.includes('type=recovery') || window.location.hash.includes('access_token')) {
-                isPasswordRecovery = true;
-                // Force show the recovery box right away
+            // Check if URL has recovery tokens or if user wants to force-open the reset box
+            const hasRecoveryToken = window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
+
+            if (hasRecoveryToken) {
                 passwordUpdateCard.classList.remove('hidden');
                 passwordUpdateCard.scrollIntoView({ behavior: 'smooth' });
-                window.history.replaceState({}, document.title, window.location.pathname);
             }
 
             const { data: { session } } = await _supabase.auth.getSession();
@@ -406,10 +404,8 @@
             
             _supabase.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'PASSWORD_RECOVERY') {
-                    isPasswordRecovery = true;
                     passwordUpdateCard.classList.remove('hidden');
                     passwordUpdateCard.scrollIntoView({ behavior: 'smooth' });
-                    window.history.replaceState({}, document.title, window.location.pathname);
                 }
                 handleSession(session);
             });
@@ -421,20 +417,16 @@
                 userPill.innerText = currentUser.email;
                 authModalBtn.innerText = 'Sign Out';
                 headerGreeting.innerText = `Welcome back, ${currentUser.email.split('@')[0]}!`;
-                
-                // If recovery is active, ensure the card stays pinned at the top
-                if (isPasswordRecovery) {
+                fetchWorkouts();
+
+                // If user logged in and has an active recovery session, show the reset card automatically
+                if (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')) {
                     passwordUpdateCard.classList.remove('hidden');
                 }
-
-                fetchWorkouts();
             } else {
                 userPill.innerText = 'Not logged in';
                 authModalBtn.innerText = 'Sign In';
                 headerGreeting.innerText = 'Good morning.';
-                if (!isPasswordRecovery) {
-                    passwordUpdateCard.classList.add('hidden');
-                }
                 renderWorkouts([]);
             }
         }
@@ -653,7 +645,7 @@
 
                 const { error } = await _supabase.from('workouts').insert([newWorkout]);
                 if (error) {
-                    alert('Error saving: ' + error.message);
+                    alert('Error saving: ' + error.memory || error.message);
                     return;
                 }
             }
