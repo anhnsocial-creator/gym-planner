@@ -379,6 +379,23 @@
 
         setCustomThemeColor(currentThemeColor, false);
         setMode(currentMode, false);
+        updateGreeting();
+
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            const greetingEl = document.getElementById('header-greeting');
+            
+            let greeting = 'Good morning.';
+            if (hour >= 12 && hour < 17) {
+                greeting = 'Good afternoon.';
+            } else if (hour >= 17 || hour < 5) {
+                greeting = 'Good evening.';
+            }
+            
+            if (greetingEl) {
+                greetingEl.textContent = greeting;
+            }
+        }
 
         const EXERCISE_LIBRARY = [
             { name: 'Barbell Bench Press', category: 'Free weight', muscle: 'Chest', videoId: 'gRVjAtPip0Y', desc: 'Retract shoulder blades, plant feet firmly, and press the barbell in a slight arc over your chest.' },
@@ -437,10 +454,8 @@
             const daysGrid = document.getElementById('calendar-days-grid');
             daysGrid.innerHTML = '';
 
-            // Extract set workout dates in YYYY-MM-DD or standard parsed format from globalWorkoutsData
             const workoutDatesSet = new Set();
             globalWorkoutsData.forEach(w => {
-                // w.date is stored like 'Sep 16, 2026' or ISO strings
                 const parsed = new Date(w.date || w.created_at);
                 if (!isNaN(parsed)) {
                     const yyyyMmDd = `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}-${String(parsed.getDate()).padStart(2, '0')}`;
@@ -450,13 +465,11 @@
 
             let activeDaysInMonth = 0;
 
-            // Blank padding for offset days before start of month
             for (let i = 0; i < firstDayIndex; i++) {
                 const emptyCell = document.createElement('div');
                 daysGrid.appendChild(emptyCell);
             }
 
-            // Render days of the month
             for (let day = 1; day <= totalDays; day++) {
                 const dayCell = document.createElement('div');
                 const formattedMonth = String(month + 1).padStart(2, '0');
@@ -592,13 +605,13 @@
             if (currentUser) {
                 userPill.innerText = currentUser.email;
                 authModalBtn.innerText = 'Sign Out';
-                headerGreeting.innerText = `Welcome back, ${currentUser.email.split('@')[0]}!`;
+                updateGreeting();
                 fetchWorkouts();
                 fetchCustomRoutines();
             } else {
                 userPill.innerText = 'Not logged in';
                 authModalBtn.innerText = 'Sign In';
-                headerGreeting.innerText = 'Good morning.';
+                updateGreeting();
                 renderWorkouts([]);
                 renderRoutines([]);
             }
