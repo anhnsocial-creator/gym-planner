@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark" id="html-root">
+<html lang="en" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,21 +10,21 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <meta name="theme-color" content="#09090b">
 </head>
-<body id="app-body" class="bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen flex flex-col items-center justify-start pb-24 md:pb-12 select-none transition-colors duration-200">
+<body id="app-body" class="app-body min-h-screen flex flex-col items-center justify-start pb-24 md:pb-12 select-none transition-colors duration-200">
 
     <!-- Top Header Bar -->
-    <header class="w-full max-w-md md:max-w-6xl px-4 py-4 flex justify-between items-center border-b border-zinc-200 dark:border-zinc-900 bg-white/80 dark:bg-zinc-950/80 sticky top-0 z-30 backdrop-blur transition-colors duration-200">
+    <header class="w-full max-w-md md:max-w-6xl px-4 py-4 flex justify-between items-center border-b app-border app-header sticky top-0 z-30 backdrop-blur transition-colors duration-200">
         <div>
-            <h1 class="text-xs font-semibold text-zinc-500 dark:text-zinc-400">YOUR TRAINING</h1>
-            <p id="header-greeting" class="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Good morning.</p>
+            <h1 class="text-xs font-semibold app-text-muted">YOUR TRAINING</h1>
+            <p id="header-greeting" class="text-lg font-bold tracking-tight app-text">Good morning.</p>
         </div>
         <div class="flex items-center gap-2">
             <!-- Mode Toggle Quick Button -->
-            <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition" title="Toggle Light/Dark Mode">
+            <button onclick="toggleDarkMode()" class="p-2 rounded-xl app-card border app-border app-text hover:opacity-80 transition" title="Toggle Light/Dark Mode">
                 <span id="mode-icon">☀️</span>
             </button>
-            <span id="user-pill" class="text-[10px] bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 px-2.5 py-1.5 rounded-full truncate max-w-[100px]">Not logged in</span>
-            <button id="auth-modal-btn" class="text-xs bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 px-3.5 py-1.5 rounded-xl transition border border-zinc-300 dark:border-zinc-700">Sign In</button>
+            <span id="user-pill" class="text-[10px] app-card border app-border app-text-muted px-2.5 py-1.5 rounded-full truncate max-w-[100px]">Not logged in</span>
+            <button id="auth-modal-btn" class="text-xs app-btn-secondary px-3.5 py-1.5 rounded-xl transition border app-border">Sign In</button>
         </div>
     </header>
 
@@ -33,20 +33,20 @@
 
         <!-- AUTH MODAL OVERLAY -->
         <div id="auth-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 w-full max-w-sm space-y-4 shadow-2xl">
+            <div class="app-card border app-border rounded-2xl p-5 w-full max-w-sm space-y-4 shadow-2xl">
                 <div class="flex justify-between items-center">
-                    <h3 id="auth-modal-title" class="text-sm font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Sign In to Cloud Sync</h3>
-                    <button id="close-auth-modal" class="text-zinc-500 hover:text-zinc-900 dark:hover:text-white text-sm px-2">✕</button>
+                    <h3 id="auth-modal-title" class="text-sm font-bold uppercase tracking-wider app-text">Sign In to Cloud Sync</h3>
+                    <button id="close-auth-modal" class="app-text-muted hover:app-text text-sm px-2">✕</button>
                 </div>
                 <form id="auth-form" class="space-y-3">
                     <input type="email" id="auth-email" required placeholder="Email address" 
-                        class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-current text-zinc-900 dark:text-zinc-200">
+                        class="w-full app-input border app-border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-current app-text">
                     <input type="password" id="auth-password" required placeholder="Password" 
-                        class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-current text-zinc-900 dark:text-zinc-200">
+                        class="w-full app-input border app-border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-current app-text">
                     <button type="submit" id="auth-submit-btn" class="w-full theme-bg text-white font-semibold py-2.5 rounded-xl text-xs transition">Login</button>
                     
                     <div class="flex justify-between items-center pt-1">
-                        <button type="button" id="auth-switch-mode" class="text-[11px] text-zinc-500 dark:text-zinc-400 hover:underline">Need an account? Sign up</button>
+                        <button type="button" id="auth-switch-mode" class="text-[11px] app-text-muted hover:underline">Need an account? Sign up</button>
                     </div>
                 </form>
             </div>
@@ -69,36 +69,36 @@
 
             <!-- Quick Stats Grid -->
             <div class="grid grid-cols-3 gap-2.5">
-                <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 rounded-2xl text-center shadow-sm">
+                <div class="app-card border app-border p-3 rounded-2xl text-center shadow-sm">
                     <span class="block text-xl mb-1">📅</span>
-                    <span id="stat-total-sessions" class="block text-base font-bold text-zinc-900 dark:text-white">0</span>
-                    <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Sessions</span>
+                    <span id="stat-total-sessions" class="block text-base font-bold app-text">0</span>
+                    <span class="text-[10px] app-text-muted uppercase tracking-wider">Sessions</span>
                 </div>
-                <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 rounded-2xl text-center shadow-sm">
+                <div class="app-card border app-border p-3 rounded-2xl text-center shadow-sm">
                     <span class="block text-xl mb-1">⏱️</span>
-                    <span id="stat-avg-duration" class="block text-base font-bold text-zinc-900 dark:text-white">0m</span>
-                    <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Avg Duration</span>
+                    <span id="stat-avg-duration" class="block text-base font-bold app-text">0m</span>
+                    <span class="text-[10px] app-text-muted uppercase tracking-wider">Avg Duration</span>
                 </div>
-                <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 rounded-2xl text-center shadow-sm">
+                <div class="app-card border app-border p-3 rounded-2xl text-center shadow-sm">
                     <span class="block text-xl mb-1">🏔️</span>
-                    <span id="stat-total-volume" class="block text-base font-bold text-zinc-900 dark:text-white">0</span>
-                    <span class="text-[10px] text-zinc-500 uppercase tracking-wider">Volume (lbs)</span>
+                    <span id="stat-total-volume" class="block text-base font-bold app-text">0</span>
+                    <span class="text-[10px] app-text-muted uppercase tracking-wider">Volume (lbs)</span>
                 </div>
             </div>
 
             <!-- Quick Action Button -->
-            <button onclick="switchTab('workouts')" class="md:hidden w-full bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition text-xs shadow-md">
+            <button onclick="switchTab('workouts')" class="md:hidden w-full app-card hover:opacity-90 border app-border app-text font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition text-xs shadow-md">
                 <span>+</span> Log a workout & view exercises
             </button>
 
             <!-- Recent Sessions Feed -->
             <div class="space-y-2.5 pt-2">
-                <h3 class="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Recent sessions</h3>
+                <h3 class="text-xs font-semibold app-text-muted uppercase tracking-wider">Recent sessions</h3>
                 <div id="recent-sessions-list" class="space-y-2">
-                    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 text-center space-y-2 shadow-sm">
+                    <div class="app-card border app-border rounded-2xl p-6 text-center space-y-2 shadow-sm">
                         <span class="text-2xl">📋</span>
-                        <h4 class="text-xs font-bold text-zinc-700 dark:text-zinc-300">No sessions yet</h4>
-                        <p class="text-[11px] text-zinc-500">Log your first session and start building your streak.</p>
+                        <h4 class="text-xs font-bold app-text">No sessions yet</h4>
+                        <p class="text-[11px] app-text-muted">Log your first session and start building your streak.</p>
                     </div>
                 </div>
             </div>
@@ -106,33 +106,33 @@
 
         <!-- COLUMN 2: WORKOUTS & EXERCISE BUILDER -->
         <section id="tab-workouts" class="space-y-4 md:block">
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl space-y-4 shadow-sm">
+            <div class="app-card border app-border p-4 rounded-2xl space-y-4 shadow-sm">
                 <div>
-                    <h2 class="text-sm font-bold text-zinc-900 dark:text-white">Workouts & Exercise Library</h2>
-                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Select exercises to build your session and check out video demonstrations.</p>
+                    <h2 class="text-sm font-bold app-text">Workouts & Exercise Library</h2>
+                    <p class="text-[11px] app-text-muted">Select exercises to build your session and check out video demonstrations.</p>
                 </div>
 
                 <div class="space-y-3">
                     <div>
-                        <label class="block text-[10px] uppercase font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Session Name</label>
-                        <input type="text" id="session-name" value="Gym session" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-200 focus:outline-none focus:border-current">
+                        <label class="block text-[10px] uppercase font-semibold app-text-muted mb-1">Session Name</label>
+                        <input type="text" id="session-name" value="Gym session" class="w-full app-input border app-border rounded-xl px-3 py-2 text-xs app-text focus:outline-none focus:border-current">
                     </div>
                 </div>
 
                 <!-- Exercise Selector & Filter -->
-                <div class="space-y-3 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                <div class="space-y-3 pt-2 border-t app-border">
                     <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">Select Exercises</span>
+                        <span class="text-xs font-bold uppercase tracking-wider app-text">Select Exercises</span>
                         <span id="selected-count" class="text-[10px] theme-text font-medium">0 selected</span>
                     </div>
 
                     <!-- Category Filter Pills -->
                     <div class="flex gap-1.5 overflow-x-auto pb-1 text-[11px]">
                         <button onclick="filterExercises('All')" class="filter-pill theme-bg text-white font-semibold px-3 py-1 rounded-full whitespace-nowrap transition">All</button>
-                        <button onclick="filterExercises('Free weight')" class="filter-pill bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-3 py-1 rounded-full whitespace-nowrap transition">Free weight</button>
-                        <button onclick="filterExercises('Machine')" class="filter-pill bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-3 py-1 rounded-full whitespace-nowrap transition">Machine</button>
-                        <button onclick="filterExercises('Cables')" class="filter-pill bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-3 py-1 rounded-full whitespace-nowrap transition">Cables</button>
-                        <button onclick="filterExercises('Calisthenics')" class="filter-pill bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-3 py-1 rounded-full whitespace-nowrap transition">Calisthenics</button>
+                        <button onclick="filterExercises('Free weight')" class="filter-pill app-card-sub app-text-muted px-3 py-1 rounded-full whitespace-nowrap transition">Free weight</button>
+                        <button onclick="filterExercises('Machine')" class="filter-pill app-card-sub app-text-muted px-3 py-1 rounded-full whitespace-nowrap transition">Machine</button>
+                        <button onclick="filterExercises('Cables')" class="filter-pill app-card-sub app-text-muted px-3 py-1 rounded-full whitespace-nowrap transition">Cables</button>
+                        <button onclick="filterExercises('Calisthenics')" class="filter-pill app-card-sub app-text-muted px-3 py-1 rounded-full whitespace-nowrap transition">Calisthenics</button>
                     </div>
 
                     <!-- Expanded Exercise List -->
@@ -140,7 +140,7 @@
                 </div>
 
                 <!-- Active Builder Set Container for Selected Exercises -->
-                <div id="active-sets-builder" class="space-y-3 hidden pt-3 border-t border-zinc-200 dark:border-zinc-800">
+                <div id="active-sets-builder" class="space-y-3 hidden pt-3 border-t app-border">
                     <h3 class="text-xs font-bold uppercase tracking-wider theme-text">Configure Sets</h3>
                     <div id="builder-rows" class="space-y-2"></div>
                 </div>
@@ -157,10 +157,10 @@
             <section id="tab-routines" class="space-y-4 md:block">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h2 class="text-base font-bold text-zinc-900 dark:text-white">Routines</h2>
-                        <p class="text-xs text-zinc-500 dark:text-zinc-400">Your reliable sessions, ready when you are.</p>
+                        <h2 class="text-base font-bold app-text">Routines</h2>
+                        <p class="text-xs app-text-muted">Your reliable sessions, ready when you are.</p>
                     </div>
-                    <button onclick="openCustomRoutineModal()" class="text-xs bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 px-3 py-1.5 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition font-semibold shadow-sm">
+                    <button onclick="openCustomRoutineModal()" class="text-xs app-card border app-border app-text px-3 py-1.5 rounded-xl hover:opacity-80 transition font-semibold shadow-sm">
                         + Custom Routine
                     </button>
                 </div>
@@ -172,43 +172,43 @@
             <!-- TAB 4: SETTINGS VIEW -->
             <section id="tab-settings" class="space-y-4 md:block pt-2">
                 <div>
-                    <h2 class="text-base font-bold text-zinc-900 dark:text-white">Settings</h2>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400">Manage account access, login credentials, and app themes.</p>
+                    <h2 class="text-base font-bold app-text">Settings</h2>
+                    <p class="text-xs app-text-muted">Manage account access, login credentials, and app themes.</p>
                 </div>
 
                 <!-- Appearance / Mode Card -->
-                <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl space-y-3 shadow-sm">
+                <div class="app-card border app-border p-4 rounded-2xl space-y-3 shadow-sm">
                     <h3 class="text-xs font-bold uppercase tracking-wider theme-text">🌗 Display Mode</h3>
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="setMode('dark')" id="mode-dark-btn" class="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-zinc-800 dark:text-zinc-200 flex items-center justify-center gap-1.5 transition">🌙 Dark Mode</button>
-                        <button onclick="setMode('light')" id="mode-light-btn" class="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 text-xs font-semibold text-zinc-800 dark:text-zinc-200 flex items-center justify-center gap-1.5 transition">☀️ Light Mode</button>
+                        <button onclick="setMode('dark')" id="mode-dark-btn" class="p-2.5 rounded-xl border app-border app-card-sub text-xs font-semibold app-text flex items-center justify-center gap-1.5 transition">🌙 Dark Mode</button>
+                        <button onclick="setMode('light')" id="mode-light-btn" class="p-2.5 rounded-xl border app-border app-card-sub text-xs font-semibold app-text flex items-center justify-center gap-1.5 transition">☀️ Light Mode</button>
                     </div>
                 </div>
 
                 <!-- Color Wheel Accent Picker -->
-                <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl space-y-3 shadow-sm">
+                <div class="app-card border app-border p-4 rounded-2xl space-y-3 shadow-sm">
                     <h3 class="text-xs font-bold uppercase tracking-wider theme-text">🎨 Custom Accent Color</h3>
                     <div class="flex items-center gap-3">
-                        <input type="color" id="color-wheel" onchange="setCustomThemeColor(this.value)" value="#f97316" class="w-12 h-10 rounded-xl cursor-pointer bg-transparent border border-zinc-200 dark:border-zinc-700 p-1">
-                        <div class="text-xs text-zinc-500 dark:text-zinc-400">
+                        <input type="color" id="color-wheel" onchange="setCustomThemeColor(this.value)" value="#f97316" class="w-12 h-10 rounded-xl cursor-pointer bg-transparent border app-border p-1">
+                        <div class="text-xs app-text-muted">
                             Pick any color from the color wheel to dynamically update your theme.
                         </div>
                     </div>
                 </div>
 
                 <!-- Change Credentials Card -->
-                <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl space-y-3 shadow-sm">
+                <div class="app-card border app-border p-4 rounded-2xl space-y-3 shadow-sm">
                     <div>
                         <h3 class="text-xs font-bold uppercase tracking-wider theme-text">🔒 Account Security</h3>
                     </div>
                     <div class="space-y-2">
                         <input type="email" id="settings-new-email" placeholder="New email address" 
-                            class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-200 focus:outline-none focus:border-current">
-                        <button type="button" onclick="changeEmailDirectly()" class="w-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold py-2 rounded-xl text-xs transition">Update Email</button>
+                            class="w-full app-input border app-border rounded-xl px-3 py-2 text-xs app-text focus:outline-none focus:border-current">
+                        <button type="button" onclick="changeEmailDirectly()" class="w-full app-btn-secondary font-semibold py-2 rounded-xl text-xs transition">Update Email</button>
 
                         <input type="password" id="settings-new-password" placeholder="New password (6+ chars)" 
-                            class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-200 focus:outline-none focus:border-current mt-2">
-                        <button type="button" onclick="changePasswordDirectly()" class="w-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold py-2 rounded-xl text-xs transition">Update Password</button>
+                            class="w-full app-input border app-border rounded-xl px-3 py-2 text-xs app-text focus:outline-none focus:border-current mt-2">
+                        <button type="button" onclick="changePasswordDirectly()" class="w-full app-btn-secondary font-semibold py-2 rounded-xl text-xs transition">Update Password</button>
                     </div>
                 </div>
             </section>
@@ -218,23 +218,23 @@
 
     <!-- CUSTOM ROUTINE MODAL -->
     <div id="custom-routine-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 w-full max-w-sm space-y-4 shadow-2xl">
+        <div class="app-card border app-border rounded-2xl p-5 w-full max-w-sm space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-zinc-800 dark:text-zinc-200">Create Custom Routine</h3>
-                <button onclick="closeCustomRoutineModal()" class="text-zinc-500 hover:text-zinc-900 dark:hover:text-white text-sm px-2">✕</button>
+                <h3 class="text-sm font-bold uppercase tracking-wider app-text">Create Custom Routine</h3>
+                <button onclick="closeCustomRoutineModal()" class="app-text-muted hover:app-text text-sm px-2">✕</button>
             </div>
             <div class="space-y-3">
                 <div>
-                    <label class="block text-[10px] uppercase font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Routine Name</label>
-                    <input type="text" id="custom-routine-title" placeholder="e.g. Heavy Leg Day" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-200 focus:outline-none focus:border-current">
+                    <label class="block text-[10px] uppercase font-semibold app-text-muted mb-1">Routine Name</label>
+                    <input type="text" id="custom-routine-title" placeholder="e.g. Heavy Leg Day" class="w-full app-input border app-border rounded-xl px-3 py-2 text-xs app-text focus:outline-none focus:border-current">
                 </div>
                 <div>
-                    <label class="block text-[10px] uppercase font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Description / Notes</label>
-                    <input type="text" id="custom-routine-desc" placeholder="e.g. Focus on deep squats & hamstrings" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-200 focus:outline-none focus:border-current">
+                    <label class="block text-[10px] uppercase font-semibold app-text-muted mb-1">Description / Notes</label>
+                    <input type="text" id="custom-routine-desc" placeholder="e.g. Focus on deep squats & hamstrings" class="w-full app-input border app-border rounded-xl px-3 py-2 text-xs app-text focus:outline-none focus:border-current">
                 </div>
                 <div>
-                    <label class="block text-[10px] uppercase font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Exercises (Comma separated)</label>
-                    <input type="text" id="custom-routine-exercises" placeholder="e.g. Barbell Squat, Leg Extension Machine" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-200 focus:outline-none focus:border-current">
+                    <label class="block text-[10px] uppercase font-semibold app-text-muted mb-1">Exercises (Comma separated)</label>
+                    <input type="text" id="custom-routine-exercises" placeholder="e.g. Barbell Squat, Leg Extension Machine" class="w-full app-input border app-border rounded-xl px-3 py-2 text-xs app-text focus:outline-none focus:border-current">
                 </div>
                 <button onclick="saveCustomRoutine()" class="w-full theme-bg text-white font-semibold py-2.5 rounded-xl text-xs transition">Save Routine to Cloud</button>
             </div>
@@ -243,45 +243,85 @@
 
     <!-- VIDEO DEMONSTRATION MODAL -->
     <div id="video-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 w-full max-w-sm space-y-4 shadow-2xl">
+        <div class="app-card border app-border rounded-2xl p-5 w-full max-w-sm space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
-                <h3 id="modal-exercise-title" class="text-sm font-bold uppercase tracking-wider text-zinc-800 dark:text-zinc-200">Exercise Demo</h3>
-                <button onclick="closeVideoModal()" class="text-zinc-500 hover:text-zinc-900 dark:hover:text-white text-sm px-2">✕</button>
+                <h3 id="modal-exercise-title" class="text-sm font-bold uppercase tracking-wider app-text">Exercise Demo</h3>
+                <button onclick="closeVideoModal()" class="app-text-muted hover:app-text text-sm px-2">✕</button>
             </div>
-            <div class="w-full aspect-video bg-zinc-100 dark:bg-zinc-950 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 flex items-center justify-center relative">
+            <div class="w-full aspect-video app-card-sub rounded-xl overflow-hidden border app-border flex items-center justify-center relative">
                 <iframe id="modal-video-iframe" class="w-full h-full" src="" title="Exercise Demonstration" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
-            <p id="modal-exercise-desc" class="text-xs text-zinc-500 dark:text-zinc-400 text-center leading-relaxed"></p>
-            <button onclick="closeVideoModal()" class="w-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold py-2.5 rounded-xl text-xs transition">Got it</button>
+            <p id="modal-exercise-desc" class="text-xs app-text-muted text-center leading-relaxed"></p>
+            <button onclick="closeVideoModal()" class="w-full app-btn-secondary font-semibold py-2.5 rounded-xl text-xs transition">Got it</button>
         </div>
     </div>
 
     <!-- Bottom Navigation Bar (Mobile only) -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-zinc-950/90 border-t border-zinc-200 dark:border-zinc-900 backdrop-blur-md z-30 max-w-md mx-auto flex justify-around py-3 px-2">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 app-header border-t app-border backdrop-blur-md z-30 max-w-md mx-auto flex justify-around py-3 px-2">
         <button onclick="switchTab('home')" id="nav-home" class="nav-btn flex flex-col items-center theme-text transition">
             <span class="text-lg">🏠</span>
             <span class="text-[10px] font-medium mt-0.5">Dashboard</span>
         </button>
-        <button onclick="switchTab('workouts')" id="nav-workouts" class="nav-btn flex flex-col items-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition">
+        <button onclick="switchTab('workouts')" id="nav-workouts" class="nav-btn flex flex-col items-center app-text-muted hover:app-text transition">
             <span class="text-lg">⚡</span>
             <span class="text-[10px] font-medium mt-0.5">Workouts</span>
         </button>
-        <button onclick="switchTab('routines')" id="nav-routines" class="nav-btn flex flex-col items-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition">
+        <button onclick="switchTab('routines')" id="nav-routines" class="nav-btn flex flex-col items-center app-text-muted hover:app-text transition">
             <span class="text-lg">📋</span>
             <span class="text-[10px] font-medium mt-0.5">Routines</span>
         </button>
-        <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition">
+        <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center app-text-muted hover:app-text transition">
             <span class="text-lg">⚙️</span>
             <span class="text-[10px] font-medium mt-0.5">Settings</span>
         </button>
     </nav>
 
-    <!-- Dynamic Theme Stylesheet Injector -->
+    <!-- Theme Stylesheet Injector & Explicit Mode Variable mapping -->
     <style>
         :root {
             --theme-color: #f97316;
             --theme-gradient: linear-gradient(to bottom right, #ea580c, #d97706);
         }
+
+        /* LIGHT MODE PALETTE */
+        html:not(.dark) {
+            --bg-main: #f4f4f5;
+            --bg-card: #ffffff;
+            --bg-card-sub: #f1f3f5;
+            --bg-input: #f9fafb;
+            --text-main: #18181b;
+            --text-muted: #71717a;
+            --border-color: #e4e4e7;
+            --btn-sec-bg: #f4f4f5;
+            --btn-sec-hover: #e4e4e7;
+            --btn-sec-text: #27272a;
+        }
+
+        /* DARK MODE PALETTE */
+        html.dark {
+            --bg-main: #09090b;
+            --bg-card: #121214;
+            --bg-card-sub: #18181b;
+            --bg-input: #09090b;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border-color: #27272a;
+            --btn-sec-bg: #27272a;
+            --btn-sec-hover: #3f3f46;
+            --btn-sec-text: #f4f4f5;
+        }
+
+        body.app-body { background-color: var(--bg-main); color: var(--text-main); }
+        .app-card { background-color: var(--bg-card); color: var(--text-main); }
+        .app-card-sub { background-color: var(--bg-card-sub); }
+        .app-input { background-color: var(--bg-input); color: var(--text-main); }
+        .app-header { background-color: var(--bg-card); background-color: color-mix(in srgb, var(--bg-card) 85%, transparent); }
+        .app-border { border-color: var(--border-color); }
+        .app-text { color: var(--text-main); }
+        .app-text-muted { color: var(--text-muted); }
+        .app-btn-secondary { background-color: var(--btn-sec-bg); color: var(--btn-sec-text); }
+        .app-btn-secondary:hover { background-color: var(--btn-sec-hover); }
+
         .theme-bg { background-color: var(--theme-color); }
         .theme-text { color: var(--theme-color); }
         .theme-gradient { background: var(--theme-gradient); }
@@ -364,7 +404,7 @@
             if (window.innerWidth >= 768) return; 
             ['home', 'workouts', 'routines', 'settings'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`nav-${t}`).className = 'nav-btn flex flex-col items-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition';
+                document.getElementById(`nav-${t}`).className = 'nav-btn flex flex-col items-center app-text-muted hover:app-text transition';
             });
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
             document.getElementById(`nav-${tabId}`).className = 'nav-btn flex flex-col items-center theme-text transition';
@@ -464,15 +504,15 @@
             filtered.forEach(ex => {
                 const isSelected = selectedExercises.some(s => s.name === ex.name);
                 const div = document.createElement('div');
-                div.className = `p-3 rounded-xl border flex justify-between items-center cursor-pointer transition ${isSelected ? 'theme-bg/10 border-current text-zinc-900 dark:text-white' : 'bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-700'}`;
+                div.className = `p-3 rounded-xl border app-border flex justify-between items-center cursor-pointer transition ${isSelected ? 'theme-bg/15 border-current app-text' : 'app-card app-text hover:opacity-80'}`;
                 div.innerHTML = `
                     <div onclick="toggleExerciseSelection('${ex.name}')" class="flex-1">
                         <h4 class="text-xs font-semibold">${ex.name}</h4>
-                        <span class="text-[10px] text-zinc-500">${ex.muscle} • ${ex.category}</span>
+                        <span class="text-[10px] app-text-muted">${ex.muscle} • ${ex.category}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button type="button" onclick="openVideoModal('${ex.name}')" class="text-[10px] bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 px-2.5 py-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800 transition">▶ Demo</button>
-                        <button type="button" onclick="toggleExerciseSelection('${ex.name}')" class="text-xs font-bold px-2.5 py-1.5 rounded-lg ${isSelected ? 'theme-bg text-white' : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-400'}">${isSelected ? 'Added ✓' : '+ Add'}</button>
+                        <button type="button" onclick="openVideoModal('${ex.name}')" class="text-[10px] app-card-sub border app-border app-text px-2.5 py-1.5 rounded-lg hover:opacity-80 transition">▶ Demo</button>
+                        <button type="button" onclick="toggleExerciseSelection('${ex.name}')" class="text-xs font-bold px-2.5 py-1.5 rounded-lg ${isSelected ? 'theme-bg text-white' : 'app-card-sub app-text-muted'}">${isSelected ? 'Added ✓' : '+ Add'}</button>
                     </div>
                 `;
                 container.appendChild(div);
@@ -484,7 +524,7 @@
                 if (btn.innerText.includes(category)) {
                     btn.className = 'filter-pill theme-bg text-white font-semibold px-3 py-1 rounded-full whitespace-nowrap transition';
                 } else {
-                    btn.className = 'filter-pill bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-3 py-1 rounded-full whitespace-nowrap transition';
+                    btn.className = 'filter-pill app-card-sub app-text-muted px-3 py-1 rounded-full whitespace-nowrap transition';
                 }
             });
             renderExerciseLibrary(category);
@@ -533,11 +573,11 @@
 
             selectedExercises.forEach((ex, exIdx) => {
                 const block = document.createElement('div');
-                block.className = 'bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-3 rounded-xl space-y-2 shadow-sm';
+                block.className = 'app-card-sub border app-border p-3 rounded-xl space-y-2 shadow-sm';
                 block.innerHTML = `
                     <div class="flex justify-between items-center">
                         <span class="text-xs font-bold theme-text">${ex.name}</span>
-                        <button type="button" onclick="removeExercise(${exIdx})" class="text-[10px] text-zinc-500 hover:text-red-500">Remove</button>
+                        <button type="button" onclick="removeExercise(${exIdx})" class="text-[10px] app-text-muted hover:text-red-500">Remove</button>
                     </div>
                     <div class="sets-list space-y-1.5"></div>
                     <button type="button" onclick="addSet(${exIdx})" class="text-[10px] theme-text font-semibold hover:underline">+ Add set</button>
@@ -548,10 +588,10 @@
                     const setRow = document.createElement('div');
                     setRow.className = 'flex items-center gap-2';
                     setRow.innerHTML = `
-                        <span class="text-[10px] text-zinc-500 w-8">Set ${setIdx + 1}</span>
-                        <input type="number" placeholder="Lbs" value="${set.weight}" onchange="updateSetVal(${exIdx}, ${setIdx}, 'weight', this.value)" class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded px-2 py-1 text-xs text-center text-zinc-900 dark:text-white focus:outline-none">
-                        <span class="text-zinc-400">×</span>
-                        <input type="number" placeholder="Reps" value="${set.reps}" onchange="updateSetVal(${exIdx}, ${setIdx}, 'reps', this.value)" class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded px-2 py-1 text-xs text-center text-zinc-900 dark:text-white focus:outline-none">
+                        <span class="text-[10px] app-text-muted w-8">Set ${setIdx + 1}</span>
+                        <input type="number" placeholder="Lbs" value="${set.weight}" onchange="updateSetVal(${exIdx}, ${setIdx}, 'weight', this.value)" class="w-full app-input border app-border rounded px-2 py-1 text-xs text-center app-text focus:outline-none">
+                        <span class="app-text-muted">×</span>
+                        <input type="number" placeholder="Reps" value="${set.reps}" onchange="updateSetVal(${exIdx}, ${setIdx}, 'reps', this.value)" class="w-full app-input border app-border rounded px-2 py-1 text-xs text-center app-text focus:outline-none">
                     `;
                     setsList.appendChild(setRow);
                 });
@@ -592,10 +632,10 @@
 
             if (!workouts || workouts.length === 0) {
                 recentList.innerHTML = `
-                    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 text-center space-y-2 shadow-sm">
+                    <div class="app-card border app-border rounded-2xl p-6 text-center space-y-2 shadow-sm">
                         <span class="text-2xl">📋</span>
-                        <h4 class="text-xs font-bold text-zinc-700 dark:text-zinc-300">No sessions yet</h4>
-                        <p class="text-[11px] text-zinc-500">Log your first session and start building your streak.</p>
+                        <h4 class="text-xs font-bold app-text">No sessions yet</h4>
+                        <p class="text-[11px] app-text-muted">Log your first session and start building your streak.</p>
                     </div>`;
                 document.getElementById('streak-sessions').innerText = '0 sessions';
                 document.getElementById('stat-total-volume-hero').innerText = 'Total Volume Lifted: 0 lbs';
@@ -622,13 +662,13 @@
 
             workouts.slice(0, 4).forEach(item => {
                 const div = document.createElement('div');
-                div.className = 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3.5 rounded-2xl flex justify-between items-center shadow-sm';
+                div.className = 'app-card border app-border p-3.5 rounded-2xl flex justify-between items-center shadow-sm';
                 div.innerHTML = `
                     <div>
-                        <h4 class="text-xs font-bold text-zinc-900 dark:text-white">${item.exercise}</h4>
-                        <p class="text-[10px] text-zinc-500 mt-0.5">${item.sets_data.map(s => `${s.weight}lbs × ${s.reps}`).join(' | ')}</p>
+                        <h4 class="text-xs font-bold app-text">${item.exercise}</h4>
+                        <p class="text-[10px] app-text-muted mt-0.5">${item.sets_data.map(s => `${s.weight}lbs × ${s.reps}`).join(' | ')}</p>
                     </div>
-                    <span class="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-2 py-1 rounded-lg">${item.date}</span>
+                    <span class="text-[10px] app-card-sub app-text-muted px-2 py-1 rounded-lg">${item.date}</span>
                 `;
                 recentList.appendChild(div);
             });
@@ -682,34 +722,34 @@
 
             defaults.forEach(r => {
                 const card = document.createElement('div');
-                card.className = 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 space-y-2 shadow-sm';
+                card.className = 'app-card border app-border rounded-2xl p-4 space-y-2 shadow-sm';
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div>
-                            <span class="text-[10px] theme-bg/10 theme-text font-semibold px-2 py-0.5 rounded">${r.category}</span>
-                            <h3 class="text-sm font-bold text-zinc-900 dark:text-white mt-1">${r.title}</h3>
+                            <span class="text-[10px] theme-bg/15 theme-text font-semibold px-2 py-0.5 rounded">${r.category}</span>
+                            <h3 class="text-sm font-bold app-text mt-1">${r.title}</h3>
                         </div>
                         <span class="text-lg">⚡</span>
                     </div>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400">${r.desc}</p>
-                    <button onclick="loadRoutineExercises(${JSON.stringify(r.exercises).replace(/"/g, '&quot;')})" class="w-full mt-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 py-2 rounded-xl text-xs font-semibold transition">Start routine</button>
+                    <p class="text-xs app-text-muted">${r.desc}</p>
+                    <button onclick="loadRoutineExercises(${JSON.stringify(r.exercises).replace(/"/g, '&quot;')})" class="w-full mt-2 app-card-sub hover:opacity-80 app-text py-2 rounded-xl text-xs font-semibold transition">Start routine</button>
                 `;
                 container.appendChild(card);
             });
 
             userRoutines.forEach(r => {
                 const card = document.createElement('div');
-                card.className = 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 space-y-2 shadow-sm relative';
+                card.className = 'app-card border app-border rounded-2xl p-4 space-y-2 shadow-sm relative';
                 card.innerHTML = `
                     <div class="flex justify-between items-start">
                         <div>
-                            <span class="text-[10px] bg-emerald-500/10 text-emerald-500 font-semibold px-2 py-0.5 rounded">Custom routine</span>
-                            <h3 class="text-sm font-bold text-zinc-900 dark:text-white mt-1">${r.title}</h3>
+                            <span class="text-[10px] bg-emerald-500/15 text-emerald-500 font-semibold px-2 py-0.5 rounded">Custom routine</span>
+                            <h3 class="text-sm font-bold app-text mt-1">${r.title}</h3>
                         </div>
-                        <button onclick="deleteCustomRoutine(${r.id})" class="text-[10px] text-zinc-400 hover:text-red-500">Delete</button>
+                        <button onclick="deleteCustomRoutine(${r.id})" class="text-[10px] app-text-muted hover:text-red-500">Delete</button>
                     </div>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400">${r.description || 'Custom user routine'}</p>
-                    <button onclick="loadRoutineExercises(${JSON.stringify(r.exercises_list).replace(/"/g, '&quot;')})" class="w-full mt-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 py-2 rounded-xl text-xs font-semibold transition">Start routine</button>
+                    <p class="text-xs app-text-muted">${r.description || 'Custom user routine'}</p>
+                    <button onclick="loadRoutineExercises(${JSON.stringify(r.exercises_list).replace(/"/g, '&quot;')})" class="w-full mt-2 app-card-sub hover:opacity-80 app-text py-2 rounded-xl text-xs font-semibold transition">Start routine</button>
                 `;
                 container.appendChild(card);
             });
