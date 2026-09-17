@@ -383,19 +383,16 @@
             } else {
                 alert('Password successfully updated!');
                 document.getElementById('new-password-input').value = '';
-                // Hide the card again after successful update
                 document.getElementById('password-update-card').classList.add('hidden');
             }
         }
 
         // Auth State Handler & Recovery Detection
         async function initAuth() {
-            // Check if URL contains recovery tokens in hash or query params
             const hash = window.location.hash;
             const searchParams = new URLSearchParams(window.location.search);
             
             if (hash.includes('type=recovery') || searchParams.get('type') === 'recovery' || hash.includes('access_token')) {
-                // Automatically show the reset card if a recovery token is present
                 document.getElementById('password-update-card').classList.remove('hidden');
             }
 
@@ -661,7 +658,7 @@
                 selectedExercises.push({ name: 'Barbell Squat', sets: [{weight: 185, reps: 5}] });
                 selectedExercises.push({ name: 'Shoulder Press', sets: [{weight: 95, reps: 8}] });
             } else {
-                selectedExercises.push({ name: 'Push Ups', sets: [{weight: 0, reps: 20}] });
+                selectedExercises.push({ name: 'Push Ups', sets: [{weight: 0, rels: 20}] });
                 selectedExercises.push({ name: 'Pull Ups', sets: [{weight: 0, reps: 10}] });
             }
             document.getElementById('selected-count').innerText = `${selectedExercises.length} selected`;
