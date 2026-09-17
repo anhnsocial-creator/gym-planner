@@ -52,7 +52,7 @@
         <!-- TAB 1: HOME VIEW -->
         <section id="tab-home" class="space-y-4">
             
-            <!-- PASSWORD RESET CARD (Hidden by default, shows only on recovery link click) -->
+            <!-- PASSWORD RESET CARD (Hidden by default, shows automatically on password recovery link click) -->
             <div id="password-update-card" class="hidden bg-zinc-900 border-2 border-orange-500 p-4 rounded-2xl space-y-3 shadow-2xl">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xs font-bold text-orange-400 uppercase tracking-wider">🔒 Reset Your Password</h3>
@@ -151,9 +151,7 @@
                     </div>
 
                     <!-- Expanded Exercise List -->
-                    <div id="exercise-library-list" class="space-y-2 max-h-64 overflow-y-auto pr-1">
-                        <!-- Populated via JS -->
-                    </div>
+                    <div id="exercise-library-list" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
                 </div>
 
                 <!-- Active Builder Set Container for Selected Exercises -->
@@ -279,7 +277,6 @@
         let currentUser = null;
         let isSignUpMode = false;
 
-        // Expanded Exercise Database
         const EXERCISE_LIBRARY = [
             { name: 'Barbell Squat', category: 'Free weight', muscle: 'Legs' },
             { name: 'Bench Press', category: 'Free weight', muscle: 'Chest' },
@@ -297,7 +294,6 @@
 
         let selectedExercises = [];
 
-        // Navigation Switcher
         function switchTab(tabId) {
             ['home', 'log', 'routines', 'history'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
@@ -308,7 +304,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Auth Modal Controls
         const authModal = document.getElementById('auth-modal');
         const authModalBtn = document.getElementById('auth-modal-btn');
         const closeAuthModal = document.getElementById('close-auth-modal');
@@ -336,7 +331,6 @@
             authSwitchMode.innerText = isSignUpMode ? 'Already have an account? Sign in' : 'Need an account? Sign up';
         });
 
-        // Forgot Password Handler
         forgotPasswordBtn.addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             if (!email) {
@@ -344,7 +338,7 @@
                 return;
             }
             const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.origin,
+                redirectTo: window.location.href.split('#')[0],
             });
             if (error) {
                 alert('Error: ' + error.message);
@@ -370,7 +364,6 @@
             }
         });
 
-        // Update Password Function
         async function updatePassword() {
             const newPassword = document.getElementById('new-password-input').value;
             if (!newPassword || newPassword.length < 6) {
@@ -384,16 +377,17 @@
                 alert('Password successfully updated!');
                 document.getElementById('new-password-input').value = '';
                 document.getElementById('password-update-card').classList.add('hidden');
+                window.location.hash = ''; // Clear recovery hash
             }
         }
 
-        // Auth State Handler & Recovery Detection
         async function initAuth() {
-            const hash = window.location.hash;
-            const searchParams = new URLSearchParams(window.location.search);
-            
-            if (hash.includes('type=recovery') || searchParams.get('type') === 'recovery' || hash.includes('access_token')) {
+            // Force aggressive check for any Supabase recovery / token indicators in the full URL or Hash
+            const fullUrl = window.location.href;
+            if (fullUrl.includes('type=recovery') || fullUrl.includes('access_token=') || fullUrl.includes('recovery')) {
                 document.getElementById('password-update-card').classList.remove('hidden');
+                // Scroll the card smoothly into view so it's immediately visible
+                document.getElementById('password-update-card').scrollIntoView({ behavior: 'smooth' });
             }
 
             const { data: { session } } = await _supabase.auth.getSession();
@@ -402,6 +396,7 @@
             _supabase.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'PASSWORD_RECOVERY') {
                     document.getElementById('password-update-card').classList.remove('hidden');
+                    document.getElementById('password-update-card').scrollIntoView({ behavior: 'smooth' });
                 }
                 handleSession(session);
             });
@@ -422,11 +417,9 @@
             }
         }
 
-        // Render Exercise Library with Filters
         function renderExerciseLibrary(filter = 'All') {
             const container = document.getElementById('exercise-library-list');
             container.innerHTML = '';
-
             const filtered = filter === 'All' ? EXERCISE_LIBRARY : EXERCISE_LIBRARY.filter(e => e.category === filter);
 
             filtered.forEach(ex => {
@@ -526,7 +519,6 @@
             selectedExercises[exIdx].sets[setIdx][field] = parseFloat(val) || 0;
         }
 
-        // Fetch Workouts from Supabase
         async function fetchWorkouts() {
             if (!currentUser) return;
             const { data, error } = await _supabase
@@ -541,7 +533,6 @@
             renderWorkouts(data);
         }
 
-        // Render Workouts across Home and History
         function renderWorkouts(workouts) {
             const recentList = document.getElementById('recent-sessions-list');
             const fullList = document.getElementById('full-history-list');
@@ -616,7 +607,6 @@
             });
         }
 
-        // Save Workout to Supabase
         async function saveWorkout() {
             if (!currentUser) {
                 authModal.classList.remove('hidden');
@@ -648,7 +638,6 @@
             fetchWorkouts();
         }
 
-        // Load Routine Starter
         function loadRoutine(routineName) {
             selectedExercises = [];
             if (routineName === 'Push / Pull / Legs') {
@@ -667,7 +656,6 @@
             switchTab('log');
         }
 
-        // Initialize App
         renderExerciseLibrary();
         initAuth();
     </script>
